@@ -4,6 +4,11 @@ A premium children's boutique management dashboard, CMS, and multi-tenant Seller
 
 ---
 
+## 🔗 Associated Storefront
+🌐 **URL**: [https://kiddostyle.gcvdanta.com](https://kiddostyle.gcvdanta.com)
+
+---
+
 ## ✨ Features
 
 - **📊 CMS Dashboard**: Core KPI highlights, revenue mix trends, and recent transaction log tables.
@@ -17,23 +22,150 @@ A premium children's boutique management dashboard, CMS, and multi-tenant Seller
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [React 18](https://reactjs.org/) + [TypeScript](https://www.typescriptlang.org/)
-- **Build Tool**: [Vite](https://vite.dev/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Icons**: [React Icons](https://react-icons.github.io/react-icons/) (Material Design Pack)
-- **Routing**: [React Router DOM v6](https://reactrouter.com/)
+- **Build Tool**: Vite 8.1.1 & @vitejs/plugin-react 6.0.3
+- **Core Library**: React 19.2.7 & React-DOM 19.2.7
+- **Routing**: React Router DOM 7.18.1
+- **State & Fetching**: React Query v5.101.2 & Axios 1.18.1
+- **Styling**: Tailwind CSS v4.3.2 & Tailwind PostCSS v4.3.2 & Autoprefixer 10.5.2
+- **Linter**: Oxlint 1.71.0
+- **Icons**: React Icons 5.7.0 & Lucide React 1.23.0
 
 ---
 
 ## 📂 Project Directory Structure
 
 ```
-src/
-├── components/          # Reusable UI widgets (Sidebar, Navbar, Stats grids)
-├── pages/               # Functional view controllers (Products, Orders, Roles, SellerPortal)
-├── App.tsx              # Application routing declaration
-├── index.css            # Custom Tailwind and premium scrollbar styles
-└── main.tsx             # Entrypoint bootstrap script
+kiddostyle-admin/
+├── dist/                   # Production build assets directory
+│   ├── assets/             # Bundled static chunks (JS/CSS)
+│   ├── favicon.svg         # Tab shortcut icon
+│   ├── icons.svg           # Icon sprites
+│   └── index.html          # Entrypoint HTML template
+├── public/                 # Static public assets
+├── src/
+│   ├── assets/             # Brand logos & background illustrations
+│   ├── components/         # Premium modular UI widgets
+│   │   ├── ActivePromotions.tsx
+│   │   ├── AnalyticsCharts.tsx
+│   │   ├── AnalyticsKpiGrid.tsx
+│   │   ├── AnalyticsMetrics.tsx
+│   │   ├── AnalyticsOverviewKpis.tsx
+│   │   ├── BannerKpiGrid.tsx
+│   │   ├── BlogKpiGrid.tsx
+│   │   ├── BrandingSettings.tsx
+│   │   ├── BrandsDistribution.tsx
+│   │   ├── BrandsKpiGrid.tsx
+│   │   ├── BrandsPortfolio.tsx
+│   │   ├── CampaignPerformance.tsx
+│   │   ├── CatalogStructureTable.tsx
+│   │   ├── CategoryInsights.tsx
+│   │   ├── CategoryKpiGrid.tsx
+│   │   ├── ContentCalendar.tsx
+│   │   ├── CouponsKpiGrid.tsx
+│   │   ├── CouponsTable.tsx
+│   │   ├── CustomerAutomationWidget.tsx
+│   │   ├── CustomerNotesActivity.tsx
+│   │   ├── CustomerOrderHistory.tsx
+│   │   ├── CustomerProfileCard.tsx
+│   │   ├── CustomersFilterTable.tsx
+│   │   ├── CustomersKpiGrid.tsx
+│   │   ├── DailySalesMix.tsx
+│   │   ├── DashboardHeader.tsx
+│   │   ├── ExistingPagesList.tsx
+│   │   ├── FinancialMetrics.tsx
+│   │   ├── FinancialTransactions.tsx
+│   │   ├── GrowthSegmentation.tsx
+│   │   ├── InventoryFilters.tsx
+│   │   ├── InventoryKpiGrid.tsx
+│   │   ├── InventoryStatus.tsx
+│   │   ├── InventoryTable.tsx
+│   │   ├── LandingPerformanceStats.tsx
+│   │   ├── Navbar.tsx
+│   │   ├── OrderDirectoryTable.tsx
+│   │   ├── OrdersFilter.tsx
+│   │   ├── OrdersHeader.tsx
+│   │   ├── OrdersTable.tsx
+│   │   ├── PayoutGoalSupport.tsx
+│   │   ├── PermissionMatrix.tsx
+│   │   ├── ProductBasicInfo.tsx
+│   │   ├── ProductCatalogTable.tsx
+│   │   ├── ProductDetailsGallery.tsx
+│   │   ├── ProductDetailsStats.tsx
+│   │   ├── ProductFormFooter.tsx
+│   │   ├── ProductMediaGallery.tsx
+│   │   ├── ProductPricingInventory.tsx
+│   │   ├── ProductPublicationStatus.tsx
+│   │   ├── ProductRecentAdminActivity.tsx
+│   │   ├── ProductsBentoSummary.tsx
+│   │   ├── ProductsFilter.tsx
+│   │   ├── ProductsHeader.tsx
+│   │   ├── ProductShippingDetails.tsx
+│   │   ├── ProductSpecifications.tsx
+│   │   ├── ProductsTable.tsx
+│   │   ├── ProductStockBreakdown.tsx
+│   │   ├── ProductVariants.tsx
+│   │   ├── RecentActivity.tsx
+│   │   ├── RecentBlogPosts.tsx
+│   │   ├── RecentPaymentsTable.tsx
+│   │   ├── RegionalContactSettings.tsx
+│   │   ├── ReturnsInsights.tsx
+│   │   ├── ReturnsKpiGrid.tsx
+│   │   ├── ReturnsTable.tsx
+│   │   ├── ReviewsFeed.tsx
+│   │   ├── ReviewsStats.tsx
+│   │   ├── RoleConfigPanel.tsx
+│   │   ├── SalesTrendChart.tsx
+│   │   ├── sellerInventoryKpiGrid.tsx
+│   │   ├── SellerOrders.tsx
+│   │   ├── SellerOrdersKpiGrid.tsx
+│   │   ├── SellerPaymentsHeader.tsx
+│   │   ├── SellerRevenueStock.tsx
+ East  ├── SellerStatsGrid.tsx
+│   │   ├── SeoHealthAudit.tsx
+│   │   ├── Sidebar.tsx
+│   │   ├── StoreFeaturesConfig.tsx
+│   │   ├── TeamDirectoryTable.tsx
+│   │   ├── TopProducts.tsx
+│   │   ├── TopSellersLogs.tsx
+│   │   ├── TopSpendersActivity.tsx
+│   │   └── UpcomingExpiredTabs.tsx
+│   ├── hooks/              # Custom query fetching states
+│   ├── pages/              # Functional view controllers
+│   │   ├── AddProduct.tsx
+│   │   ├── Analytics.tsx
+│   │   ├── Banner.tsx
+│   │   ├── Blog.tsx
+│   │   ├── Brands.tsx
+│   │   ├── Categories.tsx
+│   │   ├── Coupons.tsx
+│   │   ├── CustomerAnalytics.tsx
+│   │   ├── CustomerProfile.tsx
+│   │   ├── Customers.tsx
+│   │   ├── Dashboard.tsx
+│   │   ├── FinancialOverview.tsx
+│   │   ├── Inventory.tsx
+│   │   ├── LandingPages.tsx
+│   │   ├── Orders.tsx
+│   │   ├── ProductDetails.tsx
+│   │   ├── Products.tsx
+│   │   ├── Returns.tsx
+│   │   ├── Reviews.tsx
+│   │   ├── Roles.tsx
+│   │   ├── SellerDashboard.tsx
+│   │   ├── SellerInventory.tsx
+│   │   ├── SellerOrders.tsx
+│   │   ├── SellerPayments.tsx
+│   │   └── Settings.tsx
+│   ├── services/           # Axios client configurations
+│   ├── App.css             # Main stylesheet
+│   ├── App.tsx             # Main router configurations
+│   ├── index.css           # Tailwind custom styles
+│   └── main.tsx            # View bootstrap configuration
+├── index.html              # Entry HTML template
+├── package.json            # Scripts & dependencies
+├── postcss.config.js       # PostCSS config
+├── tailwind.config.js      # Tailwind config variables
+└── vite.config.ts          # Vite compilation settings
 ```
 
 ---
@@ -41,7 +173,7 @@ src/
 ## 🚀 Getting Started
 
 ### 1. Installation
-Clone the repository, navigate into the directory, and install project dependencies:
+Install project dependencies:
 ```bash
 npm install
 ```
@@ -54,17 +186,18 @@ npm run dev
 Open [http://localhost:5173](http://localhost:5173) in your browser to view the portal.
 
 ### 3. Production Build
-Compile optimized assets for hosting:
+Compile optimized production assets:
 ```bash
 npm run build
 ```
-The output will be available in the `dist/` directory.
+
+### 4. Local Preview
+Preview the production build locally:
+```bash
+npm run preview
+```
 
 ---
 
-## 🎨 Theme Variables & Styling
-The system uses curated custom colors for a luxury look:
-- **Primary**: `#b31f56` (Vibrant Magenta)
-- **Secondary**: `#785a00` (Classic Gold)
-- **Background**: `#faf8ff` (Light Violet/White surface)
-- **Outline**: `#dfbec4` (Soft Pink Variant border)
+## 👨‍💻 Developer
+Developed by **Divakaran S**
