@@ -4,11 +4,6 @@ A premium children's boutique management dashboard, CMS, and multi-tenant Seller
 
 ---
 
-## 🔗 Associated Storefront
-🌐 **URL**: [https://kiddostyle.gcvdanta.com](https://kiddostyle.gcvdanta.com)
-
----
-
 ## ✨ Features
 
 - **📊 CMS Dashboard**: Core KPI highlights, revenue mix trends, and recent transaction log tables.
@@ -37,135 +32,17 @@ A premium children's boutique management dashboard, CMS, and multi-tenant Seller
 ```
 kiddostyle-admin/
 ├── dist/                   # Production build assets directory
-│   ├── assets/             # Bundled static chunks (JS/CSS)
-│   ├── favicon.svg         # Tab shortcut icon
-│   ├── icons.svg           # Icon sprites
-│   └── index.html          # Entrypoint HTML template
 ├── public/                 # Static public assets
 ├── src/
 │   ├── assets/             # Brand logos & background illustrations
-│   ├── components/         # Premium modular UI widgets
-│   │   ├── ActivePromotions.tsx
-│   │   ├── AnalyticsCharts.tsx
-│   │   ├── AnalyticsKpiGrid.tsx
-│   │   ├── AnalyticsMetrics.tsx
-│   │   ├── AnalyticsOverviewKpis.tsx
-│   │   ├── BannerKpiGrid.tsx
-│   │   ├── BlogKpiGrid.tsx
-│   │   ├── BrandingSettings.tsx
-│   │   ├── BrandsDistribution.tsx
-│   │   ├── BrandsKpiGrid.tsx
-│   │   ├── BrandsPortfolio.tsx
-│   │   ├── CampaignPerformance.tsx
-│   │   ├── CatalogStructureTable.tsx
-│   │   ├── CategoryInsights.tsx
-│   │   ├── CategoryKpiGrid.tsx
-│   │   ├── ContentCalendar.tsx
-│   │   ├── CouponsKpiGrid.tsx
-│   │   ├── CouponsTable.tsx
-│   │   ├── CustomerAutomationWidget.tsx
-│   │   ├── CustomerNotesActivity.tsx
-│   │   ├── CustomerOrderHistory.tsx
-│   │   ├── CustomerProfileCard.tsx
-│   │   ├── CustomersFilterTable.tsx
-│   │   ├── CustomersKpiGrid.tsx
-│   │   ├── DailySalesMix.tsx
-│   │   ├── DashboardHeader.tsx
-│   │   ├── ExistingPagesList.tsx
-│   │   ├── FinancialMetrics.tsx
-│   │   ├── FinancialTransactions.tsx
-│   │   ├── GrowthSegmentation.tsx
-│   │   ├── InventoryFilters.tsx
-│   │   ├── InventoryKpiGrid.tsx
-│   │   ├── InventoryStatus.tsx
-│   │   ├── InventoryTable.tsx
-│   │   ├── LandingPerformanceStats.tsx
-│   │   ├── Navbar.tsx
-│   │   ├── OrderDirectoryTable.tsx
-│   │   ├── OrdersFilter.tsx
-│   │   ├── OrdersHeader.tsx
-│   │   ├── OrdersTable.tsx
-│   │   ├── PayoutGoalSupport.tsx
-│   │   ├── PermissionMatrix.tsx
-│   │   ├── ProductBasicInfo.tsx
-│   │   ├── ProductCatalogTable.tsx
-│   │   ├── ProductDetailsGallery.tsx
-│   │   ├── ProductDetailsStats.tsx
-│   │   ├── ProductFormFooter.tsx
-│   │   ├── ProductMediaGallery.tsx
-│   │   ├── ProductPricingInventory.tsx
-│   │   ├── ProductPublicationStatus.tsx
-│   │   ├── ProductRecentAdminActivity.tsx
-│   │   ├── ProductsBentoSummary.tsx
-│   │   ├── ProductsFilter.tsx
-│   │   ├── ProductsHeader.tsx
-│   │   ├── ProductShippingDetails.tsx
-│   │   ├── ProductSpecifications.tsx
-│   │   ├── ProductsTable.tsx
-│   │   ├── ProductStockBreakdown.tsx
-│   │   ├── ProductVariants.tsx
-│   │   ├── RecentActivity.tsx
-│   │   ├── RecentBlogPosts.tsx
-│   │   ├── RecentPaymentsTable.tsx
-│   │   ├── RegionalContactSettings.tsx
-│   │   ├── ReturnsInsights.tsx
-│   │   ├── ReturnsKpiGrid.tsx
-│   │   ├── ReturnsTable.tsx
-│   │   ├── ReviewsFeed.tsx
-│   │   ├── ReviewsStats.tsx
-│   │   ├── RoleConfigPanel.tsx
-│   │   ├── SalesTrendChart.tsx
-│   │   ├── sellerInventoryKpiGrid.tsx
-│   │   ├── SellerOrders.tsx
-│   │   ├── SellerOrdersKpiGrid.tsx
-│   │   ├── SellerPaymentsHeader.tsx
-│   │   ├── SellerRevenueStock.tsx
- East  ├── SellerStatsGrid.tsx
-│   │   ├── SeoHealthAudit.tsx
-│   │   ├── Sidebar.tsx
-│   │   ├── StoreFeaturesConfig.tsx
-│   │   ├── TeamDirectoryTable.tsx
-│   │   ├── TopProducts.tsx
-│   │   ├── TopSellersLogs.tsx
-│   │   ├── TopSpendersActivity.tsx
-│   │   └── UpcomingExpiredTabs.tsx
+│   ├── components/         # Reusable UI widgets
 │   ├── hooks/              # Custom query fetching states
 │   ├── pages/              # Functional view controllers
-│   │   ├── AddProduct.tsx
-│   │   ├── Analytics.tsx
-│   │   ├── Banner.tsx
-│   │   ├── Blog.tsx
-│   │   ├── Brands.tsx
-│   │   ├── Categories.tsx
-│   │   ├── Coupons.tsx
-│   │   ├── CustomerAnalytics.tsx
-│   │   ├── CustomerProfile.tsx
-│   │   ├── Customers.tsx
-│   │   ├── Dashboard.tsx
-│   │   ├── FinancialOverview.tsx
-│   │   ├── Inventory.tsx
-│   │   ├── LandingPages.tsx
-│   │   ├── Orders.tsx
-│   │   ├── ProductDetails.tsx
-│   │   ├── Products.tsx
-│   │   ├── Returns.tsx
-│   │   ├── Reviews.tsx
-│   │   ├── Roles.tsx
-│   │   ├── SellerDashboard.tsx
-│   │   ├── SellerInventory.tsx
-│   │   ├── SellerOrders.tsx
-│   │   ├── SellerPayments.tsx
-│   │   └── Settings.tsx
 │   ├── services/           # Axios client configurations
-│   ├── App.css             # Main stylesheet
 │   ├── App.tsx             # Main router configurations
 │   ├── index.css           # Tailwind custom styles
 │   └── main.tsx            # View bootstrap configuration
-├── index.html              # Entry HTML template
-├── package.json            # Scripts & dependencies
-├── postcss.config.js       # PostCSS config
-├── tailwind.config.js      # Tailwind config variables
-└── vite.config.ts          # Vite compilation settings
+└── package.json            # Scripts & dependencies
 ```
 
 ---
