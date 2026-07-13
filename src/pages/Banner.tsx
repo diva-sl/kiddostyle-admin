@@ -1,12 +1,15 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { MdAdd } from "react-icons/md";
 import { BannerKpiGrid } from "../components/BannerKpiGrid";
 import { ActivePromotions } from "../components/ActivePromotions";
 import { UpcomingExpiredTabs } from "../components/UpcomingExpiredTabs";
 
 export const BannerPage: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="space-y-8 pb-12 select-none">
+    <div className="max-w-6xl mx-auto space-y-8 pb-12 select-none">
       {/* Page Header Actions banner */}
       <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -18,7 +21,10 @@ export const BannerPage: React.FC = () => {
           </p>
         </div>
 
-        <button className="bg-[#b31f56] text-white px-6 py-3 rounded-full font-bold text-xs flex items-center gap-1.5 shadow-lg hover:shadow-[#b31f56]/20 transition-all active:scale-[0.98] cursor-pointer">
+        <button
+          onClick={() => navigate("/banner/new")}
+          className="bg-[#b31f56] text-white px-6 py-3 rounded-full font-bold text-xs flex items-center gap-1.5 shadow-lg hover:shadow-[#b31f56]/20 transition-all active:scale-[0.98] cursor-pointer border-none"
+        >
           <MdAdd className="w-4.5 h-4.5" />
           Add New Banner
         </button>
@@ -35,4 +41,5 @@ export const BannerPage: React.FC = () => {
     </div>
   );
 };
+
 export default BannerPage;

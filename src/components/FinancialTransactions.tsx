@@ -1,77 +1,111 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { MdMoreHoriz, MdKeyboardDoubleArrowRight } from "react-icons/md";
 
-interface TxnRow {
-  id: string;
-  name: string;
-  email: string;
-  initials: string;
-  avatarBg: string;
-  amount: string;
-  status: "paid" | "pending" | "refunded";
-  statusText: string;
-  statusColor: string;
-  date: string;
+interface FinancialTransactionsProps {
+  orders: any[];
 }
 
-const transactions: TxnRow[] = [
+const fallbackTransactions = [
   {
-    id: "#TXN-94021",
+    id: "TXN-94021",
     name: "Maria Anders",
     email: "m.anders@email.com",
-    initials: "MA",
-    avatarBg: "bg-[#ffd167]/30 text-[#785a00]",
     amount: "$248.00",
     status: "paid",
-    statusText: "Paid",
-    statusColor: "bg-green-50 text-green-700 border border-green-150",
-    date: "",
+    date: "Oct 24, 2026",
   },
   {
-    id: "#TXN-94020",
+    id: "TXN-94020",
     name: "David Lee",
     email: "d.lee@email.com",
-    initials: "DL",
-    avatarBg: "bg-[#ffd9df] text-[#b31f56]",
     amount: "$1,210.50",
     status: "pending",
-    statusText: "Pending",
-    statusColor: "bg-amber-50 text-amber-700 border border-amber-100",
-    date: "",
+    date: "Oct 23, 2026",
   },
   {
-    id: "#TXN-94019",
+    id: "TXN-94019",
     name: "Sumi Kim",
     email: "s.kim@email.com",
-    initials: "SK",
-    avatarBg: "bg-[#b7eaff] text-[#006780]",
     amount: "$89.00",
     status: "refunded",
-    statusText: "Refunded",
-    statusColor: "bg-red-50 text-red-700 border border-red-100",
-    date: "",
+    date: "Oct 22, 2026",
   },
   {
-    id: "#TXN-94018",
+    id: "TXN-94018",
     name: "James Taylor",
     email: "j.taylor@email.com",
-    initials: "JT",
-    avatarBg: "bg-[#f2f3ff] text-[#584045]",
     amount: "$432.25",
     status: "paid",
-    statusText: "Paid",
-    statusColor: "bg-green-50 text-green-700 border border-green-150",
-    date: "",
+    date: "Oct 21, 2026",
   },
 ];
 
-export const FinancialTransactions: React.FC = () => {
+export const FinancialTransactions: React.FC<FinancialTransactionsProps> = ({
+  orders,
+}) => {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<"all" | "paid" | "refunded">("all");
 
-  const filteredTxns = transactions.filter((t) => {
+  // Map orders list to transactional structure or fall back
+  const displayList =
+    orders.length > 0
+      ? orders.map((o) => {
+          const initials = (o.customer?.name || "G")
+            .split(" ")
+            .map((w: string) => w[0])
+            .join("")
+            .substring(0, 2)
+            .toUpperCase();
+          return {
+            id: `TXN-${o.orderNumber}`,
+            orderId: o.id,
+            name: o.customer?.name || "Guest Customer",
+            email: o.customer?.email || "N/A",
+            initials,
+            avatarBg: "bg-[#ffd9df] text-[#b31f56]",
+            amount: `$${o.totalAmount.toFixed(2)}`,
+            status: o.status === "delivered" ? "paid" : "pending",
+            date: o.createdAt
+              ? new Date(o.createdAt).toLocaleDateString()
+              : "Just now",
+          };
+        })
+      : fallbackTransactions.map((t) => {
+          const initials = t.name
+            .split(" ")
+            .map((w) => w[0])
+            .join("")
+            .substring(0, 2)
+            .toUpperCase();
+          return {
+            id: t.id,
+            orderId: "",
+            name: t.name,
+            email: t.email,
+            initials,
+            avatarBg:
+              t.status === "paid"
+                ? "bg-[#ffd167]/30 text-[#785a00]"
+                : "bg-[#b7eaff] text-[#006780]",
+            amount: t.amount,
+            status: t.status,
+            date: t.date,
+          };
+        });
+
+  const filteredTxns = displayList.filter((t) => {
     if (filter === "all") return true;
     return t.status === filter;
   });
+
+  const getStatusColor = (status: string) => {
+    if (status === "paid")
+      return "bg-green-50 text-green-700 border border-green-150";
+    if (status === "pending")
+      return "bg-amber-50 text-amber-700 border border-amber-100";
+    return "bg-red-50 text-red-700 border border-red-100";
+  };
 
   return (
     <div className="bg-white p-6 rounded-3xl border border-[#dfbec4]/30 shadow-sm select-none">
@@ -87,36 +121,19 @@ export const FinancialTransactions: React.FC = () => {
         </div>
 
         <div className="flex p-1 bg-[#faf8ff] rounded-2xl border border-[#dfbec4]/20">
-          <button
-            onClick={() => setFilter("all")}
-            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              filter === "all"
-                ? "bg-white text-[#b31f56] shadow-sm"
-                : "text-[#584045]/60 hover:text-[#131b2e]"
-            }`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setFilter("paid")}
-            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              filter === "paid"
-                ? "bg-white text-[#b31f56] shadow-sm"
-                : "text-[#584045]/60 hover:text-[#131b2e]"
-            }`}
-          >
-            Paid
-          </button>
-          <button
-            onClick={() => setFilter("refunded")}
-            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              filter === "refunded"
-                ? "bg-white text-[#b31f56] shadow-sm"
-                : "text-[#584045]/60 hover:text-[#131b2e]"
-            }`}
-          >
-            Refunded
-          </button>
+          {(["all", "paid", "refunded"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setFilter(tab)}
+              className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer capitalize ${
+                filter === tab
+                  ? "bg-white text-[#b31f56] shadow-sm"
+                  : "text-[#584045]/60 hover:text-[#131b2e]"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -136,7 +153,12 @@ export const FinancialTransactions: React.FC = () => {
           <tbody className="text-xs font-semibold text-[#131b2e]">
             {filteredTxns.map((row, idx) => (
               <tr key={idx} className="group hover:bg-[#faf8ff] transition-all">
-                <td className="px-4 py-4 bg-white border-y border-l border-[#dfbec4]/20 rounded-l-2xl group-hover:border-[#b31f56]/20 font-bold text-[#b31f56]">
+                <td
+                  onClick={() =>
+                    row.orderId && navigate(`/orders/${row.orderId}`)
+                  }
+                  className="px-4 py-4 bg-white border-y border-l border-[#dfbec4]/20 rounded-l-2xl group-hover:border-[#b31f56]/20 font-bold text-[#b31f56] cursor-pointer hover:underline"
+                >
                   {row.id}
                 </td>
 
@@ -162,10 +184,10 @@ export const FinancialTransactions: React.FC = () => {
 
                 <td className="px-4 py-4 bg-white border-y border-[#dfbec4]/20 group-hover:border-[#b31f56]/20">
                   <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${row.statusColor}`}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${getStatusColor(row.status)}`}
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                    {row.statusText}
+                    <span className="capitalize">{row.status}</span>
                   </span>
                 </td>
 
@@ -174,7 +196,13 @@ export const FinancialTransactions: React.FC = () => {
                 </td>
 
                 <td className="px-4 py-4 bg-white border-y border-r border-[#dfbec4]/20 rounded-r-2xl text-right group-hover:border-[#b31f56]/20">
-                  <button className="p-1.5 hover:bg-[#faf8ff] rounded-xl text-[#584045]/60 hover:text-[#b31f56] transition-all cursor-pointer">
+                  <button
+                    onClick={() =>
+                      row.orderId && navigate(`/orders/${row.orderId}`)
+                    }
+                    className="p-1.5 hover:bg-[#faf8ff] rounded-xl text-[#584045]/60 hover:text-[#b31f56] transition-all cursor-pointer border-none bg-none"
+                    title="View Transaction Invoice"
+                  >
                     <MdMoreHoriz className="w-5 h-5" />
                   </button>
                 </td>
@@ -186,7 +214,10 @@ export const FinancialTransactions: React.FC = () => {
 
       {/* View All Bottom Link */}
       <div className="flex justify-center mt-6">
-        <button className="flex items-center gap-1 text-[#b31f56] font-bold text-xs hover:underline cursor-pointer group">
+        <button
+          onClick={() => navigate("/orders")}
+          className="flex items-center gap-1 text-[#b31f56] font-bold text-xs hover:underline cursor-pointer group border-none bg-none"
+        >
           View All Transaction History
           <MdKeyboardDoubleArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
         </button>

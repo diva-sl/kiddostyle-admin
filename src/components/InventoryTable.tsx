@@ -5,6 +5,7 @@ import {
   MdChevronLeft,
   MdChevronRight,
 } from "react-icons/md";
+import { useProducts } from "../hooks/useProducts";
 
 interface InventoryItemProps {
   id: string;
@@ -21,13 +22,13 @@ interface InventoryItemProps {
   image: string;
 }
 
-const inventoryRows: InventoryItemProps[] = [
+const fallbackInventoryList: InventoryItemProps[] = [
   {
     id: "1",
     name: "Cotton Peony Jumpsuit",
-    category: "Kids / Apparel",
+    category: "Newborn",
     sku: "PJ-2024-PNK-S",
-    warehouse: "SEATTLE-01",
+    warehouse: "Main Hub - Seattle",
     totalStock: 12,
     committed: 4,
     available: 8,
@@ -39,9 +40,9 @@ const inventoryRows: InventoryItemProps[] = [
   {
     id: "2",
     name: "Heritage Leather Boots",
-    category: "Kids / Footwear",
+    category: "Shoes",
     sku: "BT-772-TAN-24",
-    warehouse: "LONDON-H",
+    warehouse: "London - Heathrow",
     totalStock: 452,
     committed: 28,
     available: 424,
@@ -53,9 +54,9 @@ const inventoryRows: InventoryItemProps[] = [
   {
     id: "3",
     name: "Midnight Wool Sweater",
-    category: "Kids / Knitwear",
+    category: "Toddler Boy",
     sku: "SW-991-NVY-M",
-    warehouse: "NEWJERSEY-H",
+    warehouse: "East Coast - NJ",
     totalStock: 0,
     committed: 0,
     available: 0,
@@ -67,9 +68,9 @@ const inventoryRows: InventoryItemProps[] = [
   {
     id: "4",
     name: "Artisan Animal Blocks",
-    category: "Toys / Wooden",
+    category: "Toddler Girl",
     sku: "TY-404-WDN-S",
-    warehouse: "SEATTLE-01",
+    warehouse: "Main Hub - Seattle",
     totalStock: 1200,
     committed: 450,
     available: 750,
@@ -83,16 +84,86 @@ const inventoryRows: InventoryItemProps[] = [
 
 interface InventoryTableProps {
   onSelectionChange: (count: number) => void;
+  warehouseFilter: string;
+  statusFilter: string;
+  categoryFilter: string;
 }
 
 export const InventoryTable: React.FC<InventoryTableProps> = ({
   onSelectionChange,
+  warehouseFilter,
+  statusFilter,
+  categoryFilter,
 }) => {
+  const { data: dbProducts, isLoading } = useProducts();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  // Pagination states
+  const ITEMS_PER_PAGE = 4;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Map products to inventory listing structures
+  const baseList: InventoryItemProps[] =
+    dbProducts && dbProducts.length > 0
+      ? dbProducts.map((p) => {
+          // Warehouse simulator mapping
+          const warehouse = p.category.toLowerCase().includes("newborn")
+            ? "Main Hub - Seattle"
+            : p.category.toLowerCase().includes("shoes")
+              ? "London - Heathrow"
+              : "East Coast - NJ";
+
+          const committed = Math.floor(p.stock * 0.15); // simulate committed purchases locks
+          const available = p.stock - committed;
+
+          const statusType =
+            p.stock > 10 ? "healthy" : p.stock > 0 ? "low" : "out";
+          const statusText =
+            p.stock > 10
+              ? "Healthy"
+              : p.stock > 0
+                ? "Low Stock"
+                : "Out of Stock";
+
+          return {
+            id: p.id,
+            name: p.name,
+            category: p.category,
+            sku: p.id.substring(0, 8).toUpperCase(),
+            warehouse,
+            totalStock: p.stock,
+            committed,
+            available,
+            statusText,
+            statusType,
+            isHighDemand: p.stock > 100,
+            image:
+              p.images?.[0] ||
+              "https://images.unsplash.com/photo-1515488042361-404e9250afef?auto=format&fit=crop&w=150&q=80",
+          };
+        })
+      : fallbackInventoryList;
+
+  // Apply Liftoff Filter constraints
+  const filteredList = baseList.filter((item) => {
+    const matchesWarehouse =
+      warehouseFilter === "All Warehouses" ||
+      item.warehouse === warehouseFilter;
+    const matchesCategory =
+      categoryFilter === "All Categories" || item.category === categoryFilter;
+
+    let matchesStatus = true;
+    if (statusFilter === "In Stock") matchesStatus = item.statusType !== "out";
+    if (statusFilter === "Low Stock") matchesStatus = item.statusType === "low";
+    if (statusFilter === "Out of Stock")
+      matchesStatus = item.statusType === "out";
+
+    return matchesWarehouse && matchesCategory && matchesStatus;
+  });
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      const allIds = inventoryRows.map((r) => r.id);
+      const allIds = filteredList.map((r) => r.id);
       setSelectedIds(allIds);
       onSelectionChange(allIds.length);
     } else {
@@ -112,7 +183,28 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
     onSelectionChange(updated.length);
   };
 
-  const isAllSelected = selectedIds.length === inventoryRows.length;
+  const isAllSelected =
+    filteredList.length > 0 && selectedIds.length === filteredList.length;
+
+  // Pagination Calculations
+  const totalItems = filteredList.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
+  const paginatedList = filteredList.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
+
+  const startIdx =
+    totalItems === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1;
+  const endIdx = Math.min(currentPage * ITEMS_PER_PAGE, totalItems);
+
+  if (isLoading) {
+    return (
+      <div className="py-12 text-center text-xs font-semibold text-[#584045]/70">
+        Syncing inventory canvas data...
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-[2rem] overflow-hidden border border-[#dfbec4]/30 shadow-sm">
@@ -138,7 +230,7 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-[#dfbec4]/20 text-xs font-semibold text-[#131b2e]">
-            {inventoryRows.map((row) => {
+            {paginatedList.map((row) => {
               const isChecked = selectedIds.includes(row.id);
               const isOut = row.statusType === "out";
               const isLow = row.statusType === "low";
@@ -159,7 +251,6 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
                     />
                   </td>
 
-                  {/* Product image layout */}
                   <td className="py-4 px-4">
                     <div className="flex items-center gap-3">
                       <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-[#dfbec4]/20 shrink-0">
@@ -196,13 +287,7 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
                   </td>
 
                   <td
-                    className={`py-4 px-4 text-right font-bold text-sm ${
-                      isOut
-                        ? "text-[#ba1a1a]"
-                        : isLow
-                          ? "text-[#785a00]"
-                          : "text-[#131b2e]"
-                    }`}
+                    className={`py-4 px-4 text-right font-bold text-sm ${isOut ? "text-[#ba1a1a]" : isLow ? "text-[#785a00]" : "text-[#131b2e]"}`}
                   >
                     {row.totalStock.toLocaleString()}
                   </td>
@@ -211,15 +296,8 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
                     {row.committed}
                   </td>
 
-                  {/* Available count and alert indicators */}
                   <td
-                    className={`py-4 px-4 text-right font-extrabold text-sm ${
-                      isOut
-                        ? "text-[#ba1a1a]"
-                        : isLow
-                          ? "text-[#785a00]"
-                          : "text-[#131b2e]"
-                    }`}
+                    className={`py-4 px-4 text-right font-extrabold text-sm ${isOut ? "text-[#ba1a1a]" : isLow ? "text-[#785a00]" : "text-[#131b2e]"}`}
                   >
                     <div className="flex items-center justify-end gap-1">
                       {row.available.toLocaleString()}
@@ -229,7 +307,6 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
                     </div>
                   </td>
 
-                  {/* Status tags */}
                   <td className="py-4 px-4 text-center">
                     <div className="flex flex-col items-center">
                       <span
@@ -238,9 +315,7 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
                             ? "bg-[#ffdad6] text-[#ba1a1a]"
                             : isLow
                               ? "bg-[#ffd167]/30 text-[#765900]"
-                              : row.statusType === "healthy"
-                                ? "bg-[#b7eaff] text-[#004e61]"
-                                : "bg-[#b7eaff]/60 text-[#004e61]"
+                              : "bg-[#b7eaff] text-[#004e61]"
                         }`}
                       >
                         {row.statusText}
@@ -259,25 +334,29 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
         </table>
       </div>
 
-      {/* Pagination */}
+      {/* Pagination Footer */}
       <div className="p-6 bg-[#f2f3ff]/50 border-t border-[#dfbec4]/20 flex items-center justify-between select-none">
         <p className="text-xs text-[#584045]/80 font-semibold">
-          Showing 1-10 of 2,480 products
+          Showing {startIdx}-{endIdx} of {totalItems} products
         </p>
-        <div className="flex gap-1">
-          <button className="p-2 rounded-lg hover:bg-[#faf8ff] border border-[#dfbec4]/20 transition-colors cursor-pointer">
+        <div className="flex gap-1.5">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="p-2 rounded-lg hover:bg-white border border-[#dfbec4]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          >
             <MdChevronLeft className="w-4 h-4 text-[#584045]" />
           </button>
-          <button className="px-3.5 py-1.5 rounded-lg bg-[#b31f56] text-white font-bold text-xs shadow-sm">
-            1
-          </button>
-          <button className="px-3.5 py-1.5 rounded-lg hover:bg-white transition-colors font-bold text-xs cursor-pointer">
-            2
-          </button>
-          <button className="px-3.5 py-1.5 rounded-lg hover:bg-white transition-colors font-bold text-xs cursor-pointer">
-            3
-          </button>
-          <button className="p-2 rounded-lg hover:bg-[#faf8ff] border border-[#dfbec4]/20 transition-colors cursor-pointer">
+          <span className="px-3.5 py-1.5 rounded-lg bg-[#b31f56] text-white font-bold text-xs select-none">
+            {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            className="p-2 rounded-lg hover:bg-white border border-[#dfbec4]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          >
             <MdChevronRight className="w-4 h-4 text-[#584045]" />
           </button>
         </div>

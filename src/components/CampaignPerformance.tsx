@@ -1,6 +1,9 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export const CampaignPerformance: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
       {/* Left Trends Graph Card */}
@@ -72,7 +75,12 @@ export const CampaignPerformance: React.FC = () => {
           </p>
         </div>
 
-        <button className="relative z-10 w-full py-4 bg-[#765900] text-white font-extrabold text-xs rounded-full hover:shadow-lg transition-all active:scale-95 cursor-pointer">
+        <button
+          onClick={() =>
+            navigate("/coupons/new", { state: { preset: "tiered" } })
+          }
+          className="relative z-10 w-full py-4 bg-[#765900] text-white font-extrabold text-xs rounded-full hover:shadow-lg transition-all active:scale-95 cursor-pointer"
+        >
           Create Tiered Promo
         </button>
 

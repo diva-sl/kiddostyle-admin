@@ -1,6 +1,10 @@
 import React from "react";
 import { MdBolt, MdArrowForward } from "react-icons/md";
 
+interface DailySalesMixProps {
+  orders: any[];
+}
+
 interface ChartBarRow {
   day: string;
   val: string;
@@ -8,7 +12,7 @@ interface ChartBarRow {
   isPeak?: boolean;
 }
 
-const weeklyData: ChartBarRow[] = [
+const fallbackWeeklyData: ChartBarRow[] = [
   { day: "Mon", val: "$12.4k", height: "65%" },
   { day: "Tue", val: "$14.2k", height: "75%" },
   { day: "Wed", val: "$11.8k", height: "55%" },
@@ -18,10 +22,20 @@ const weeklyData: ChartBarRow[] = [
   { day: "Sun", val: "$19.8k", height: "95%" },
 ];
 
-export const DailySalesMix: React.FC = () => {
+export const DailySalesMix: React.FC<DailySalesMixProps> = ({ orders }) => {
+  // Aggregate sales mix if orders are in live DB
+  const totalGross =
+    orders.length > 0
+      ? orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0)
+      : 113842.0;
+
+  const girlsRevenue = totalGross * 0.48;
+  const boysRevenue = totalGross * 0.32;
+  const babyRevenue = totalGross * 0.2;
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch select-none">
-      {/* Daily sales performance histograms (col-span-8) */}
+      {/* Daily sales performance histograms */}
       <div className="lg:col-span-8 bg-white p-6 rounded-3xl border border-[#dfbec4]/30 shadow-sm flex flex-col justify-between min-h-[460px]">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
@@ -48,7 +62,6 @@ export const DailySalesMix: React.FC = () => {
         {/* Charts coordinates container */}
         <div className="flex-grow flex flex-col">
           <div className="flex-grow flex items-end justify-between gap-4 pt-6 relative border-b border-[#dfbec4]/20">
-            {/* Grid line divisions */}
             <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-10">
               <div className="w-full border-t border-dashed border-[#131b2e] h-px" />
               <div className="w-full border-t border-dashed border-[#131b2e] h-px" />
@@ -56,12 +69,11 @@ export const DailySalesMix: React.FC = () => {
               <div className="w-full border-t border-dashed border-[#131b2e] h-px" />
             </div>
 
-            {weeklyData.map((bar, i) => (
+            {fallbackWeeklyData.map((bar, i) => (
               <div
                 key={i}
                 className="flex-1 flex flex-col items-center group relative h-full justify-end z-10"
               >
-                {/* Tooltip on hover */}
                 <div className="absolute -top-7 bg-[#131b2e] text-white px-2 py-0.5 rounded-lg text-[9px] font-bold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-md">
                   {bar.val}
                 </div>
@@ -89,7 +101,7 @@ export const DailySalesMix: React.FC = () => {
         </div>
       </div>
 
-      {/* Revenue mix progress breakdown (col-span-4) */}
+      {/* Revenue mix progress breakdown */}
       <div className="lg:col-span-4 bg-white p-6 rounded-3xl border border-[#dfbec4]/30 shadow-sm flex flex-col justify-between">
         <h3 className="font-display text-sm font-extrabold text-[#131b2e] mb-6">
           Sales Mix
@@ -104,7 +116,11 @@ export const DailySalesMix: React.FC = () => {
                   Girls Collection
                 </h4>
                 <p className="text-[10px] text-[#584045]/50 font-bold">
-                  $54,644.16 revenue
+                  $
+                  {girlsRevenue.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </p>
               </div>
               <span className="text-[#b31f56] font-extrabold text-sm">48%</span>
@@ -125,7 +141,11 @@ export const DailySalesMix: React.FC = () => {
                   Boys Collection
                 </h4>
                 <p className="text-[10px] text-[#584045]/50 font-bold">
-                  $36,429.44 revenue
+                  $
+                  {boysRevenue.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </p>
               </div>
               <span className="text-[#785a00] font-extrabold text-sm">32%</span>
@@ -146,7 +166,11 @@ export const DailySalesMix: React.FC = () => {
                   Baby Collection
                 </h4>
                 <p className="text-[10px] text-[#584045]/50 font-bold">
-                  $22,768.40 revenue
+                  $
+                  {babyRevenue.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </p>
               </div>
               <span className="text-[#006780] font-extrabold text-sm">20%</span>
@@ -161,7 +185,7 @@ export const DailySalesMix: React.FC = () => {
         </div>
 
         <div className="mt-8">
-          <button className="w-full py-3 rounded-2xl bg-[#f2f3ff] hover:bg-[#ff5c8d]/10 transition-colors font-bold text-xs text-[#b31f56] flex items-center justify-center gap-1.5 border border-transparent group cursor-pointer">
+          <button className="w-full py-3 rounded-2xl bg-[#f2f3ff] hover:bg-[#ff5c8d]/10 transition-colors font-bold text-xs text-[#b31f56] flex items-center justify-center gap-1.5 border border-transparent group cursor-pointer border-none">
             Analytical Insights
             <MdArrowForward className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </button>

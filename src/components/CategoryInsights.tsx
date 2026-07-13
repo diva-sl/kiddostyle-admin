@@ -1,57 +1,89 @@
 import React from "react";
 import { MdLightbulb, MdTaskAlt, MdArrowForward } from "react-icons/md";
+import { useCategories } from "../hooks/useCategories";
+import { useProducts } from "../hooks/useProducts";
+
+interface PerformanceItem {
+  name: string;
+  count: number;
+  percentage: number;
+  color: string;
+}
 
 export const CategoryInsights: React.FC = () => {
+  const { data: categories = [] } = useCategories();
+  const { data: products = [] } = useProducts();
+
+  const totalProducts = products.length || 1;
+
+  // Build live category stats, fallback to static mock parameters if empty
+  let performanceList: PerformanceItem[] = [];
+
+  if (categories.length > 0) {
+    const list = categories.map((cat) => {
+      const count = products.filter(
+        (p) => p.category.toLowerCase() === cat.name.toLowerCase(),
+      ).length;
+      const percentage = Math.round((count / totalProducts) * 100);
+      return {
+        name: cat.name,
+        count,
+        percentage,
+        color: cat.name.toLowerCase().includes("girl")
+          ? "bg-[#b31f56]"
+          : cat.name.toLowerCase().includes("boy")
+            ? "bg-[#ffd167]"
+            : "bg-[#00a4ca]",
+      };
+    });
+    // Sort by count to show top performing categories first
+    performanceList = list.sort((a, b) => b.count - a.count).slice(0, 3);
+  }
+
+  // Fallback visual definitions if database has no items
+  if (performanceList.length === 0) {
+    performanceList = [
+      { name: "Girls Wear", count: 342, percentage: 85, color: "bg-[#b31f56]" },
+      {
+        name: "Accessories",
+        count: 249,
+        percentage: 62,
+        color: "bg-[#ffd167]",
+      },
+      {
+        name: "Winter Collection",
+        count: 180,
+        percentage: 48,
+        color: "bg-[#00a4ca]",
+      },
+    ];
+  }
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
       {/* Category sales performance */}
       <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-[#dfbec4]/30 shadow-sm space-y-6">
         <h4 className="font-display text-base font-extrabold text-[#131b2e]">
-          Category Performance
+          Category Catalog Distribution
         </h4>
 
         <div className="space-y-5">
-          {/* Performance Item 1 */}
-          <div>
-            <div className="flex justify-between items-center mb-1.5 text-xs font-bold">
-              <span className="text-[#131b2e]">Girls Wear</span>
-              <span className="text-[#b31f56]">85% growth</span>
+          {performanceList.map((item, idx) => (
+            <div key={idx}>
+              <div className="flex justify-between items-center mb-1.5 text-xs font-bold">
+                <span className="text-[#131b2e]">{item.name}</span>
+                <span className="text-[#584045]/85">
+                  {item.percentage}% share ({item.count} items)
+                </span>
+              </div>
+              <div className="w-full bg-[#f2f3ff] rounded-full h-3 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${item.color}`}
+                  style={{ width: `${item.percentage}%` }}
+                />
+              </div>
             </div>
-            <div className="w-full bg-[#f2f3ff] rounded-full h-3 overflow-hidden">
-              <div
-                className="bg-[#b31f56] h-full rounded-full"
-                style={{ width: "85%" }}
-              />
-            </div>
-          </div>
-
-          {/* Performance Item 2 */}
-          <div>
-            <div className="flex justify-between items-center mb-1.5 text-xs font-bold">
-              <span className="text-[#131b2e]">Accessories</span>
-              <span className="text-[#785a00]">62% growth</span>
-            </div>
-            <div className="w-full bg-[#f2f3ff] rounded-full h-3 overflow-hidden">
-              <div
-                className="bg-[#ffd167] h-full rounded-full"
-                style={{ width: "62%" }}
-              />
-            </div>
-          </div>
-
-          {/* Performance Item 3 */}
-          <div>
-            <div className="flex justify-between items-center mb-1.5 text-xs font-bold">
-              <span className="text-[#131b2e]">Winter Collection</span>
-              <span className="text-[#006780]">48% growth</span>
-            </div>
-            <div className="w-full bg-[#f2f3ff] rounded-full h-3 overflow-hidden">
-              <div
-                className="bg-[#00a4ca] h-full rounded-full"
-                style={{ width: "48%" }}
-              />
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
@@ -64,29 +96,34 @@ export const CategoryInsights: React.FC = () => {
             <MdLightbulb className="w-6 h-6" />
           </div>
           <h4 className="font-display text-base font-extrabold text-[#131b2e]">
-            SEO Quick Tips
+            SEO Checklist Quick Tips
           </h4>
           <p className="text-xs text-[#584045]/70 font-semibold mt-1">
-            Optimize your category pages for better search visibility.
+            Optimize your category landing index for search engine rankings.
           </p>
         </div>
 
-        <ul className="space-y-3 my-5 text-xs font-bold text-[#131b2e] leading-relaxed">
-          <li className="flex gap-2 items-start">
+        <ul className="space-y-3.5 my-5 text-xs font-bold text-[#131b2e] leading-relaxed">
+          <li className="flex gap-2.5 items-start">
             <MdTaskAlt className="text-[#b31f56] w-4.5 h-4.5 shrink-0 mt-0.5" />
             <span>
-              Use descriptive H1 titles with keywords like "Toddler Dresses".
+              Write descriptive descriptive keywords like{" "}
+              <strong>"Infant Rompers"</strong> inside H1 headers.
             </span>
           </li>
-          <li className="flex gap-2 items-start">
+          <li className="flex gap-2.5 items-start">
             <MdTaskAlt className="text-[#b31f56] w-4.5 h-4.5 shrink-0 mt-0.5" />
             <span>
-              Add meta-descriptions (150-160 chars) for each category.
+              Keep custom meta-descriptions between 150-160 characters for high
+              click-through rates.
             </span>
           </li>
-          <li className="flex gap-2 items-start">
+          <li className="flex gap-2.5 items-start">
             <MdTaskAlt className="text-[#b31f56] w-4.5 h-4.5 shrink-0 mt-0.5" />
-            <span>Internal link your main categories from the homepage.</span>
+            <span>
+              Use Gated Sub-categories internally to distribute PageRank catalog
+              power.
+            </span>
           </li>
         </ul>
 

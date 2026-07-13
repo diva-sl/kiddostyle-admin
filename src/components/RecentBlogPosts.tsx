@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { MdFilterList, MdDownload, MdEdit, MdDelete } from "react-icons/md";
+import { useArticles, useDeleteArticle } from "../hooks/useBlog";
 
-interface BlogPost {
+interface ChartBar {
   title: string;
   meta: string;
   author: string;
@@ -13,60 +15,103 @@ interface BlogPost {
   image: string;
 }
 
-const postsList: BlogPost[] = [
+const fallbackPosts = [
   {
+    id: "1",
     title: "Summer 2024 Kids Trends",
-    meta: "Published: Oct 24, 2023",
     author: "Sarah Jenkins",
-    category: "Style Tips",
-    categoryColor: "bg-[#00a4ca]/10 text-[#006780]",
+    tags: ["style"],
     status: "published",
-    statusText: "Published",
-    statusColor: "bg-green-500",
+    createdAt: "2026-10-24T12:00:00.000Z",
     image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAdfh8XxKcr8q57Mgd7G846hlqg9-qq-FWFC1j0MTk4HkgCZVX4kHvG0Y2-ebI4f2bkFjDON31TXeI8iBofsinogQJkgAr9gXhWUE6Te-FpU_ZNtnECLjS4TxFYmrocFetZmkmeyIqgsgzs5t2JQlQ2pUloP4TNBYFQP2hnjWhLd9L0DoIECHWQkPvgUoRlYxWlnqiJsKKkr--kCN3-MtlfHCS7RfK3I8HPvU4yHV3ndUKO4zhYkW3QJKpOIKvSRJpjJp-hyQrx0YO-",
+      "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=150&q=80",
   },
   {
+    id: "2",
     title: "Rainy Day Essentials",
-    meta: "Scheduled: Nov 05, 2023",
     author: "Leo Maxwell",
-    category: "Product News",
-    categoryColor: "bg-[#ffd167]/30 text-[#765900]",
+    tags: ["news"],
     status: "scheduled",
-    statusText: "Scheduled",
-    statusColor: "bg-[#785a00]",
+    createdAt: "2026-11-05T12:00:00.000Z",
     image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDOcNNuOwGFD2kcrT-NQ1GUJrK2SlAXOoSg04UXuGDU875unv4kZ31EtKIPdU-YTdRxKogmKquKk2K1zIzLQ2bxw_JCNbLL6j-5bZ3YTw8H1uHP3xQXTMhtO5IEb9lrW9KnxMAj7pWDNbY-pGj74fau-vJKygP__8rz2m0gU_J3we8i7LLz_L7J4-2TQybud3krTOyFm5Kf2O1zrMz_4FTJoQANmHeijylEN3v75Zg2dWHUA0HiwZsS68Ylhqg45JMxB6AWzgsUBIGf",
+      "https://images.unsplash.com/photo-1519457431-44ccd64a579b?auto=format&fit=crop&w=150&q=80",
   },
   {
+    id: "3",
     title: "Warm Knits for Winter",
-    meta: "Status: Draft",
     author: "Sarah Jenkins",
-    category: "Fashion",
-    categoryColor: "bg-[#ff5c8d]/20 text-[#b31f56]",
+    tags: ["fashion"],
     status: "draft",
-    statusText: "Draft",
-    statusColor: "bg-[#584045]/60",
+    createdAt: "2026-10-20T12:00:00.000Z",
     image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuChOfGlzBxeARgRqNB-_QtGETSQ2oK0tivGi0YaPHY_qCReMztEwLuCiiw7MfhbPqEfxTayfzZg7aRZNCxNYffOIjHroB5XP_hh-mkPxjdO0tV2XKStzW6WwX-C69i9aCxvsGoyk_hd5IDl2wmdz_EKYHcfObNWgNHBDbAkSXmPEMb8jtaVrfSkYPLUBNZ9bba5cXAFU1fCeP7CC6xc9SkkisEoF4HP7Xrt2WPNjgfcysau6JXyWVRlr1NYRlYeopXwHUBnJXZ1dkuj",
+      "https://images.unsplash.com/photo-1515488042361-404e9250afef?auto=format&fit=crop&w=150&q=80",
   },
 ];
 
 export const RecentBlogPosts: React.FC = () => {
+  const navigate = useNavigate();
+  const { data: articles = [], isLoading } = useArticles();
+  const deleteMutation = useDeleteArticle();
+
+  // Pagination states
+  const ITEMS_PER_PAGE = 3;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const handleDelete = (id: string) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this blog article permanently?",
+      )
+    ) {
+      deleteMutation.mutate(id);
+    }
+  };
+
+  // Map to list elements or fall back
+  const displayList: any[] =
+    articles.length > 0
+      ? articles
+      : fallbackPosts.map((p) => ({
+          id: p.id,
+          title: p.title,
+          author: p.author,
+          tags: p.tags,
+          status: p.status,
+          createdAt: p.createdAt,
+          image: p.image,
+        }));
+
+  // Slicing parameters
+  const totalItems = displayList.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
+  const paginatedList = displayList.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
+
+  const getStatusColor = (status: string) => {
+    if (status === "published") return "bg-green-500";
+    if (status === "scheduled") return "bg-[#785a00]";
+    return "bg-[#584045]/60";
+  };
+
+  if (isLoading) {
+    return (
+      <div className="py-12 text-center text-xs font-semibold text-[#584045]/70 select-none bg-white rounded-3xl border border-[#dfbec4]/30">
+        Loading recent articles...
+      </div>
+    );
+  }
+
   return (
-    <div className="glass-card rounded-3xl shadow-sm overflow-hidden border border-[#dfbec4]/30 bg-white/40">
+    <div className="glass-card rounded-3xl shadow-sm overflow-hidden border border-[#dfbec4]/30 bg-white/40 select-none">
       {/* Header controls */}
       <div className="p-6 border-b border-[#dfbec4]/30 flex justify-between items-center bg-white/40">
         <h3 className="font-display text-base font-extrabold text-[#131b2e]">
           Recent Posts
         </h3>
-        <div className="flex gap-2">
-          <button className="p-2 rounded-full border border-[#dfbec4]/30 hover:bg-[#f2f3ff] transition-colors cursor-pointer">
-            <MdFilterList className="w-5 h-5 text-[#584045]/70" />
-          </button>
-          <button className="p-2 rounded-full border border-[#dfbec4]/30 hover:bg-[#f2f3ff] transition-colors cursor-pointer">
-            <MdDownload className="w-5 h-5 text-[#584045]/70" />
-          </button>
+        <div className="flex gap-2 text-xs font-bold text-[#584045]/75">
+          Showing {paginatedList.length} items
         </div>
       </div>
 
@@ -83,62 +128,84 @@ export const RecentBlogPosts: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-[#dfbec4]/20 text-xs font-semibold text-[#131b2e]">
-            {postsList.map((post, idx) => (
-              <tr
-                key={idx}
-                className="hover:bg-[#ff5c8d]/5 transition-colors group"
-              >
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-16 h-12 rounded-xl bg-[#f2f3ff] overflow-hidden shrink-0 border border-[#dfbec4]/20">
-                      <img
-                        className="w-full h-full object-cover"
-                        src={post.image}
-                        alt={post.title}
+            {paginatedList.map((post) => {
+              const categoryName = post.tags?.[0] || "Style Tips";
+
+              return (
+                <tr
+                  key={post.id}
+                  className="hover:bg-[#ff5c8d]/5 transition-colors group"
+                >
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        onClick={() => navigate(`/blog/${post.id}`)}
+                        className="w-16 h-12 rounded-xl bg-[#f2f3ff] overflow-hidden shrink-0 border border-[#dfbec4]/20 cursor-pointer"
+                      >
+                        <img
+                          className="w-full h-full object-cover"
+                          src={
+                            post.image ||
+                            "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=150&q=80"
+                          }
+                          alt={post.title}
+                        />
+                      </div>
+                      <div>
+                        <div
+                          onClick={() => navigate(`/blog/${post.id}`)}
+                          className="font-bold text-sm text-[#131b2e] hover:text-[#b31f56] cursor-pointer transition-colors"
+                        >
+                          {post.title}
+                        </div>
+                        <div className="text-[10px] text-[#584045]/50 font-bold mt-0.5">
+                          Published:{" "}
+                          {new Date(
+                            post.createdAt || Date.now(),
+                          ).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="px-6 py-4 text-[#131b2e]">{post.author}</td>
+
+                  <td className="px-6 py-4">
+                    <span className="px-3 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-[#00a4ca]/10 text-[#006780]">
+                      {categoryName}
+                    </span>
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <span className="flex items-center gap-1.5 font-bold text-xs capitalize">
+                      <span
+                        className={`w-2 h-2 rounded-full ${getStatusColor(post.status)}`}
                       />
+                      {post.status}
+                    </span>
+                  </td>
+
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => navigate(`/blog/edit/${post.id}`)}
+                        className="p-1 hover:text-[#b31f56] transition-colors cursor-pointer border-none bg-none"
+                        title="Edit Article"
+                      >
+                        <MdEdit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(post.id)}
+                        className="p-1 hover:text-[#ba1a1a] transition-colors cursor-pointer border-none bg-none"
+                        title="Delete Article"
+                      >
+                        <MdDelete className="w-4 h-4" />
+                      </button>
                     </div>
-                    <div>
-                      <div className="font-bold text-sm text-[#131b2e] group-hover:text-[#b31f56] transition-colors">
-                        {post.title}
-                      </div>
-                      <div className="text-[10px] text-[#584045]/50 font-bold mt-0.5">
-                        {post.meta}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-
-                <td className="px-6 py-4 text-[#131b2e]">{post.author}</td>
-
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider ${post.categoryColor}`}
-                  >
-                    {post.category}
-                  </span>
-                </td>
-
-                <td className="px-6 py-4">
-                  <span className="flex items-center gap-1.5 font-bold text-xs">
-                    <span
-                      className={`w-2 h-2 rounded-full ${post.statusColor}`}
-                    />
-                    {post.statusText}
-                  </span>
-                </td>
-
-                <td className="px-6 py-4 text-right">
-                  <div className="flex gap-2 justify-end">
-                    <button className="p-1 hover:text-[#b31f56] transition-colors cursor-pointer">
-                      <MdEdit className="w-4 h-4" />
-                    </button>
-                    <button className="p-1 hover:text-[#ba1a1a] transition-colors cursor-pointer">
-                      <MdDelete className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -146,19 +213,26 @@ export const RecentBlogPosts: React.FC = () => {
       {/* Pagination indicators */}
       <div className="p-6 bg-[#f2f3ff]/30 border-t border-[#dfbec4]/20 flex items-center justify-between select-none">
         <span className="text-xs font-bold text-[#584045]/70">
-          Showing 3 of 32 posts
+          Showing {paginatedList.length} of {totalItems} posts
         </span>
         <div className="flex gap-1.5">
-          <button className="px-3.5 py-1.5 rounded-lg border border-[#dfbec4]/30 hover:bg-white text-xs font-bold text-[#584045] transition-colors cursor-pointer">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-3.5 py-1.5 rounded-lg border border-[#dfbec4]/30 hover:bg-white text-xs font-bold text-[#584045] disabled:opacity-30 transition-colors cursor-pointer"
+          >
             Prev
           </button>
-          <button className="px-3.5 py-1.5 rounded-lg bg-[#b31f56] text-white font-extrabold text-xs shadow-sm">
-            1
-          </button>
-          <button className="px-3.5 py-1.5 rounded-lg border border-[#dfbec4]/30 hover:bg-white text-xs font-bold text-[#584045] transition-colors cursor-pointer">
-            2
-          </button>
-          <button className="px-3.5 py-1.5 rounded-lg border border-[#dfbec4]/30 hover:bg-white text-xs font-bold text-[#584045] transition-colors cursor-pointer">
+          <span className="px-3.5 py-1.5 rounded-lg bg-[#b31f56] text-white font-extrabold text-xs shadow-sm">
+            {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            className="px-3.5 py-1.5 rounded-lg border border-[#dfbec4]/30 hover:bg-white text-xs font-bold text-[#584045] disabled:opacity-30 transition-colors cursor-pointer"
+          >
             Next
           </button>
         </div>

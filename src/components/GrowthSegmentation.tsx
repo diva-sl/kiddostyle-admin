@@ -1,4 +1,5 @@
 import React from "react";
+import { useCustomers } from "../hooks/useCustomers";
 
 interface SegmentItem {
   title: string;
@@ -8,39 +9,76 @@ interface SegmentItem {
   opacity?: string;
 }
 
-const segmentItems: SegmentItem[] = [
-  {
-    title: "VIP",
-    description: "Top 5% of spenders",
-    percentage: "15%",
-    indicatorColor: "bg-[#b31f56]",
-  },
-  {
-    title: "Active",
-    description: "Ordered in last 30d",
-    percentage: "42%",
-    indicatorColor: "bg-[#00a4ca]",
-  },
-  {
-    title: "New",
-    description: "First order this month",
-    percentage: "28%",
-    indicatorColor: "bg-[#ffd167]",
-  },
-  {
-    title: "At-Risk",
-    description: "No order in 90d",
-    percentage: "15%",
-    indicatorColor: "bg-[#584045]/60",
-    opacity: "opacity-50",
-  },
-];
-
 export const GrowthSegmentation: React.FC = () => {
+  const { data: customers = [] } = useCustomers();
+
+  // Calculate dynamic segment shares
+  const total = customers.length || 1;
+  const vipCount = customers.filter((c) => c.totalSpent > 1000).length;
+  const activeCount = customers.filter((c) => c.status === "active").length;
+  const suspendedCount = customers.filter(
+    (c) => c.status === "suspended",
+  ).length;
+
+  const vipPct = Math.round((vipCount / total) * 100);
+  const activePct = Math.round((activeCount / total) * 100);
+  const atRiskPct = Math.round((suspendedCount / total) * 100);
+
+  const segmentItems: SegmentItem[] =
+    customers.length > 0
+      ? [
+          {
+            title: "VIP Tier",
+            description: "Spent over $1,000",
+            percentage: `${vipPct}%`,
+            indicatorColor: "bg-[#b31f56]",
+          },
+          {
+            title: "Active Accounts",
+            description: "Verified and active status",
+            percentage: `${activePct}%`,
+            indicatorColor: "bg-[#00a4ca]",
+          },
+          {
+            title: "At-Risk",
+            description: "Suspended or blocked accounts",
+            percentage: `${atRiskPct}%`,
+            indicatorColor: "bg-[#584045]/60",
+            opacity: "opacity-50",
+          },
+        ]
+      : [
+          {
+            title: "VIP",
+            description: "Top 5% of spenders",
+            percentage: "15%",
+            indicatorColor: "bg-[#b31f56]",
+          },
+          {
+            title: "Active",
+            description: "Ordered in last 30d",
+            percentage: "42%",
+            indicatorColor: "bg-[#00a4ca]",
+          },
+          {
+            title: "New",
+            description: "First order this month",
+            percentage: "28%",
+            indicatorColor: "bg-[#ffd167]",
+          },
+          {
+            title: "At-Risk",
+            description: "No order in 90d",
+            percentage: "15%",
+            indicatorColor: "bg-[#584045]/60",
+            opacity: "opacity-50",
+          },
+        ];
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* LTV & CAC Growth Histograms (col-span-2) */}
-      <div className="lg:col-span-2 bg-white p-6 rounded-[2rem] border border-[#dfbec4]/30 shadow-sm flex flex-col justify-between select-none">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 select-none">
+      {/* LTV & CAC Growth Histograms */}
+      <div className="lg:col-span-2 bg-white p-6 rounded-[2rem] border border-[#dfbec4]/30 shadow-sm flex flex-col justify-between">
         <div className="flex justify-between items-center mb-6">
           <h4 className="font-display text-sm font-extrabold text-[#131b2e]">
             Growth Trends
@@ -62,7 +100,7 @@ export const GrowthSegmentation: React.FC = () => {
           </div>
         </div>
 
-        {/* Bar charts layout */}
+        {/* Column Bar Charts */}
         <div className="h-60 flex items-end justify-between gap-4 px-4 relative pt-4">
           <div className="absolute inset-x-0 inset-y-4 flex flex-col justify-between pointer-events-none opacity-10">
             <div className="border-t border-[#131b2e] w-full h-px" />
@@ -175,8 +213,8 @@ export const GrowthSegmentation: React.FC = () => {
         </div>
       </div>
 
-      {/* Tiers Segmentation Breakdown (col-span-1) */}
-      <div className="lg:col-span-1 bg-white p-6 rounded-[2rem] border border-[#dfbec4]/30 shadow-sm flex flex-col select-none">
+      {/* Tiers Segmentation Breakdown */}
+      <div className="lg:col-span-1 bg-white p-6 rounded-[2rem] border border-[#dfbec4]/30 shadow-sm flex flex-col">
         <h4 className="font-display text-sm font-extrabold text-[#131b2e] mb-6">
           Segmentation
         </h4>

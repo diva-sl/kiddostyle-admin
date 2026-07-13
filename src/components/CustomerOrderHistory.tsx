@@ -1,4 +1,9 @@
 import React from "react";
+import type { Customer } from "../services/customerService";
+
+interface CustomerOrderHistoryProps {
+  customer: Customer;
+}
 
 interface OrderRow {
   id: string;
@@ -18,7 +23,7 @@ const historyList: OrderRow[] = [
     status: "processing",
     statusText: "Processing",
     statusColor: "bg-[#ffd167]/30 text-[#765900]",
-    amount: "",
+    amount: "$210.00",
   },
   {
     id: "#KS-88231",
@@ -27,7 +32,7 @@ const historyList: OrderRow[] = [
     status: "delivered",
     statusText: "Delivered",
     statusColor: "bg-green-50 text-green-700 border border-green-100",
-    amount: "",
+    amount: "$154.50",
   },
   {
     id: "#KS-85112",
@@ -36,13 +41,15 @@ const historyList: OrderRow[] = [
     status: "delivered",
     statusText: "Delivered",
     statusColor: "bg-green-50 text-green-700 border border-green-100",
-    amount: "",
+    amount: "$420.00",
   },
 ];
 
-export const CustomerOrderHistory: React.FC = () => {
+export const CustomerOrderHistory: React.FC<CustomerOrderHistoryProps> = ({
+  customer,
+}) => {
   return (
-    <div className="bg-white rounded-3xl border border-[#dfbec4]/30 shadow-sm overflow-hidden">
+    <div className="bg-white rounded-3xl border border-[#dfbec4]/30 shadow-sm overflow-hidden select-none">
       {/* Title */}
       <div className="p-6 border-b border-[#dfbec4]/20 flex justify-between items-center select-none">
         <h3 className="font-display text-base font-extrabold text-[#131b2e]">

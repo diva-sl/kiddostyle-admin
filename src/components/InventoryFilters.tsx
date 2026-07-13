@@ -8,25 +8,41 @@ import {
 
 interface InventoryFiltersProps {
   selectedCount: number;
+  warehouseFilter: string;
+  setWarehouseFilter: (val: string) => void;
+  statusFilter: string;
+  setStatusFilter: (val: string) => void;
+  categoryFilter: string;
+  setCategoryFilter: (val: string) => void;
 }
 
 export const InventoryFilters: React.FC<InventoryFiltersProps> = ({
   selectedCount,
+  warehouseFilter,
+  setWarehouseFilter,
+  statusFilter,
+  setStatusFilter,
+  categoryFilter,
+  setCategoryFilter,
 }) => {
   const isBatchActive = selectedCount > 0;
 
   return (
-    <div className="bg-white p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 border border-[#dfbec4]/30 shadow-sm">
+    <div className="bg-white p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 border border-[#dfbec4]/30 shadow-sm select-none">
       {/* Dropdown Filters */}
       <div className="flex flex-wrap items-center gap-4">
         {/* Location Dropdown */}
         <div className="flex items-center gap-1.5 px-4 py-2 bg-[#faf8ff] rounded-xl border border-[#dfbec4]/25 relative">
           <MdLocationOn className="text-[#584045]/60 w-4 h-4" />
-          <select className="bg-transparent border-none text-xs font-bold text-[#584045] pr-6 focus:ring-0 outline-none cursor-pointer appearance-none">
-            <option>All Warehouses</option>
-            <option>Main Hub - Seattle</option>
-            <option>East Coast - NJ</option>
-            <option>London - Heathrow</option>
+          <select
+            value={warehouseFilter}
+            onChange={(e) => setWarehouseFilter(e.target.value)}
+            className="bg-transparent border-none text-xs font-bold text-[#584045] pr-6 focus:ring-0 outline-none cursor-pointer appearance-none"
+          >
+            <option value="All Warehouses">All Warehouses</option>
+            <option value="Main Hub - Seattle">Main Hub - Seattle</option>
+            <option value="East Coast - NJ">East Coast - NJ</option>
+            <option value="London - Heathrow">London - Heathrow</option>
           </select>
           <MdExpandMore className="absolute right-2 top-1/2 -translate-y-1/2 text-[#584045]/60 pointer-events-none w-4 h-4" />
         </div>
@@ -34,11 +50,15 @@ export const InventoryFilters: React.FC<InventoryFiltersProps> = ({
         {/* Status Dropdown */}
         <div className="flex items-center gap-1.5 px-4 py-2 bg-[#faf8ff] rounded-xl border border-[#dfbec4]/25 relative">
           <MdFilterList className="text-[#584045]/60 w-4 h-4" />
-          <select className="bg-transparent border-none text-xs font-bold text-[#584045] pr-6 focus:ring-0 outline-none cursor-pointer appearance-none">
-            <option>Stock Status: All</option>
-            <option>In Stock</option>
-            <option>Low Stock</option>
-            <option>Out of Stock</option>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="bg-transparent border-none text-xs font-bold text-[#584045] pr-6 focus:ring-0 outline-none cursor-pointer appearance-none"
+          >
+            <option value="Stock Status: All">Stock Status: All</option>
+            <option value="In Stock">In Stock</option>
+            <option value="Low Stock">Low Stock</option>
+            <option value="Out of Stock">Out of Stock</option>
           </select>
           <MdExpandMore className="absolute right-2 top-1/2 -translate-y-1/2 text-[#584045]/60 pointer-events-none w-4 h-4" />
         </div>
@@ -46,11 +66,16 @@ export const InventoryFilters: React.FC<InventoryFiltersProps> = ({
         {/* Category Dropdown */}
         <div className="flex items-center gap-1.5 px-4 py-2 bg-[#faf8ff] rounded-xl border border-[#dfbec4]/25 relative">
           <MdCategory className="text-[#584045]/60 w-4 h-4" />
-          <select className="bg-transparent border-none text-xs font-bold text-[#584045] pr-6 focus:ring-0 outline-none cursor-pointer appearance-none">
-            <option>All Categories</option>
-            <option>Knitwear</option>
-            <option>Footwear</option>
-            <option>Outerwear</option>
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="bg-transparent border-none text-xs font-bold text-[#584045] pr-6 focus:ring-0 outline-none cursor-pointer appearance-none"
+          >
+            <option value="All Categories">All Categories</option>
+            <option value="Newborn">Newborn</option>
+            <option value="Toddler Boy">Toddler Boy</option>
+            <option value="Toddler Girl">Toddler Girl</option>
+            <option value="Shoes">Shoes</option>
           </select>
           <MdExpandMore className="absolute right-2 top-1/2 -translate-y-1/2 text-[#584045]/60 pointer-events-none w-4 h-4" />
         </div>
@@ -58,11 +83,7 @@ export const InventoryFilters: React.FC<InventoryFiltersProps> = ({
 
       {/* Batch Action Buttons */}
       <div
-        className={`flex items-center gap-4 transition-all duration-300 ${
-          isBatchActive
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-40 pointer-events-none"
-        }`}
+        className={`flex items-center gap-4 transition-all duration-300 ${isBatchActive ? "opacity-100 pointer-events-auto" : "opacity-40 pointer-events-none"}`}
       >
         <span className="text-xs font-bold text-[#584045]">
           <span className="text-[#b31f56] font-extrabold mr-1">

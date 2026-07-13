@@ -1,12 +1,15 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { MdAdd, MdSpeed } from "react-icons/md";
 import { LandingPerformanceStats } from "../components/LandingPerformanceStats";
 import { ExistingPagesList } from "../components/ExistingPagesList";
 import { SeoHealthAudit } from "../components/SeoHealthAudit";
 
 export const LandingPagesPage: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="space-y-8 pb-12 select-none">
+    <div className="max-w-6xl mx-auto space-y-8 pb-12 select-none">
       {/* Page Header Actions banner */}
       <section className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
@@ -18,7 +21,10 @@ export const LandingPagesPage: React.FC = () => {
           </p>
         </div>
 
-        <button className="flex items-center gap-1.5 bg-[#b31f56] text-white px-6 py-3 rounded-full font-bold text-xs shadow-lg hover:bg-[#ffd9df] hover:text-[#b31f56] hover:shadow-[#b31f56]/20 transition-all active:scale-[0.98] cursor-pointer">
+        <button
+          onClick={() => navigate("/landing-pages/new")}
+          className="flex items-center gap-1.5 bg-[#b31f56] text-white px-6 py-3 rounded-full font-bold text-xs shadow-lg hover:bg-[#ffd9df] hover:text-[#b31f56] hover:shadow-[#b31f56]/20 transition-all active:scale-[0.98] cursor-pointer border-none"
+        >
           <MdAdd className="w-5 h-5" />
           Create New Page
         </button>
@@ -44,16 +50,17 @@ export const LandingPagesPage: React.FC = () => {
           Performance Insights
         </span>
 
-        <button className="w-14 h-14 bg-[#ffd167] text-[#765900] rounded-full shadow-2xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer">
+        <button className="w-14 h-14 bg-[#ffd167] text-[#765900] rounded-full shadow-2xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer border-none">
           <MdSpeed className="w-7 h-7" />
         </button>
       </div>
 
       {/* Atmospheric Branding Footer */}
       <footer className="text-center pt-8 text-[10px] text-[#584045]/40 font-bold select-none border-t border-[#dfbec4]/10 mt-12 pb-4">
-        © 2024 KiddoStyle Premium CMS Engine. All rights reserved.
+        © 2026 KiddoStyle Premium CMS Engine. All rights reserved.
       </footer>
     </div>
   );
 };
+
 export default LandingPagesPage;

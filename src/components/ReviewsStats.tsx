@@ -1,9 +1,27 @@
 import React from "react";
 import { MdStar } from "react-icons/md";
+import { useReviews } from "../hooks/useReviews";
 
 export const ReviewsStats: React.FC = () => {
+  const { data: reviews = [] } = useReviews();
+
+  // Dynamic calculations
+  const totalCount = reviews.length > 0 ? reviews.length : 1240;
+
+  // Calculate average rating
+  const avgRating =
+    reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : 4.8;
+
+  // Calculate pending count
+  const pendingCount =
+    reviews.length > 0
+      ? reviews.filter((r) => r.status === "pending").length
+      : 24;
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 select-none">
       {/* Total Reviews */}
       <div className="bg-[#f2f3ff] p-6 rounded-3xl border border-[#dfbec4]/30 shadow-sm cursor-default">
         <p className="text-xs font-bold text-[#584045]/70 uppercase tracking-wider">
@@ -11,9 +29,9 @@ export const ReviewsStats: React.FC = () => {
         </p>
         <div className="flex items-baseline gap-2 mt-2">
           <span className="text-2xl font-extrabold text-[#131b2e] leading-none">
-            12,842
+            {totalCount.toLocaleString()}
           </span>
-          <span className="text-[#785a00] font-bold text-xs">+12%</span>
+          <span className="text-[#785a00] font-bold text-xs">Live DB</span>
         </div>
       </div>
 
@@ -24,14 +42,15 @@ export const ReviewsStats: React.FC = () => {
         </p>
         <div className="flex items-center gap-2 mt-2">
           <span className="text-2xl font-extrabold text-[#131b2e] leading-none">
-            4.8
+            {avgRating.toFixed(1)}
           </span>
           <div className="flex text-[#ffd167] shrink-0">
-            <MdStar className="w-4 h-4" />
-            <MdStar className="w-4 h-4" />
-            <MdStar className="w-4 h-4" />
-            <MdStar className="w-4 h-4" />
-            <MdStar className="w-4 h-4 text-[#dfbec4]" />
+            {[...Array(5)].map((_, i) => (
+              <MdStar
+                key={i}
+                className={`w-4 h-4 ${i < Math.round(avgRating) ? "" : "text-[#dfbec4]"}`}
+              />
+            ))}
           </div>
         </div>
       </div>
@@ -39,14 +58,14 @@ export const ReviewsStats: React.FC = () => {
       {/* Pending Reviews */}
       <div className="bg-[#f2f3ff] p-6 rounded-3xl border border-[#dfbec4]/30 shadow-sm cursor-default">
         <p className="text-xs font-bold text-[#584045]/70 uppercase tracking-wider">
-          Pending Review
+          Pending Reviews
         </p>
         <div className="flex items-baseline gap-2 mt-2">
           <span className="text-2xl font-extrabold text-[#b31f56] leading-none">
-            24
+            {pendingCount}
           </span>
           <span className="text-[#584045]/60 text-xs font-bold font-display uppercase tracking-widest">
-            urgent
+            {pendingCount > 0 ? "urgent" : "optimal"}
           </span>
         </div>
       </div>

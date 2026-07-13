@@ -11,8 +11,14 @@ export const ProductsHeader: React.FC = () => {
         <h2 className="font-display text-2xl font-extrabold text-[#131b2e] mb-1">
           Product Management
         </h2>
+        {/* Clickable Breadcrumbs */}
         <nav className="flex items-center gap-1.5 text-xs text-[#584045]/60 font-semibold select-none">
-          <span>Dashboard</span>
+          <span
+            onClick={() => navigate("/")}
+            className="hover:text-[#b31f56] cursor-pointer transition-colors"
+          >
+            Dashboard
+          </span>
           <MdChevronRight className="w-4 h-4" />
           <span className="text-[#b31f56] font-bold">Products</span>
         </nav>

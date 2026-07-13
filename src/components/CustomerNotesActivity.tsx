@@ -1,5 +1,10 @@
 import React from "react";
 import { MdAdd, MdMail, MdSupportAgent, MdPayments } from "react-icons/md";
+import type { Customer } from "../services/customerService";
+
+interface CustomerNotesActivityProps {
+  customer: Customer;
+}
 
 interface NoteItem {
   text: string;
@@ -15,7 +20,7 @@ interface ActivityLogItem {
   iconBg: string;
 }
 
-const notesList: NoteItem[] = [
+const fallbackNotes: NoteItem[] = [
   {
     text: '"Prefer non-scented packaging. Mentioned she buys for her twin boys (age 4)."',
     meta: "Added by Sarah J. • 2 days ago",
@@ -43,15 +48,26 @@ const logsList: ActivityLogItem[] = [
     iconBg: "bg-[#b7eaff] text-[#006780]",
   },
   {
-    title: "Order #KS-90124 Placed",
-    detail: "Payment successful via Visa ending in 4242",
+    title: "Order Placed",
+    detail: "Payment successful via storefront gateway",
     time: "Oct 24, 2023",
     icon: <MdPayments className="w-4 h-4" />,
     iconBg: "bg-[#ffdf9b] text-[#785a00]",
   },
 ];
 
-export const CustomerNotesActivity: React.FC = () => {
+export const CustomerNotesActivity: React.FC<CustomerNotesActivityProps> = ({
+  customer,
+}) => {
+  // Use customer notes if available, fallback to mock list
+  const displayNotes: NoteItem[] =
+    customer.notes && customer.notes.length > 0
+      ? customer.notes.map((note) => ({
+          text: `"${note}"`,
+          meta: `Added by Admin • ${new Date(customer.joinedDate || Date.now()).toLocaleDateString()}`,
+        }))
+      : fallbackNotes;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch select-none">
       {/* Left Column: Notes Details */}
@@ -60,13 +76,13 @@ export const CustomerNotesActivity: React.FC = () => {
           <h3 className="font-display text-base font-extrabold text-[#131b2e]">
             Internal Notes
           </h3>
-          <button className="w-9 h-9 rounded-full bg-[#f2f3ff] hover:bg-[#b31f56] hover:text-white text-[#b31f56] flex items-center justify-center transition-all cursor-pointer">
+          <button className="w-9 h-9 rounded-full bg-[#f2f3ff] hover:bg-[#b31f56] hover:text-white text-[#b31f56] flex items-center justify-center transition-all cursor-pointer border-none">
             <MdAdd className="w-5 h-5" />
           </button>
         </div>
 
         <div className="space-y-4 flex-grow">
-          {notesList.map((note, i) => (
+          {displayNotes.map((note, i) => (
             <div
               key={i}
               className={`p-4 bg-[#faf8ff] rounded-2xl border border-[#dfbec4]/10 ${

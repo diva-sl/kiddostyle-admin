@@ -1,27 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   MdFilterList,
-  MdSort,
   MdVisibility,
   MdEdit,
+  MdDelete,
   MdBarChart,
   MdChevronLeft,
   MdChevronRight,
 } from "react-icons/md";
+import {
+  useLandingPages,
+  useDeleteLandingPage,
+} from "../hooks/useLandingPages";
 
-interface LandingPageItem {
-  title: string;
-  slug: string;
-  status: "published" | "draft" | "scheduled";
-  statusText: string;
-  statusColor: string;
-  statusBg: string;
-  lastEdited: string;
-  analyticsActive: boolean;
-}
-
-const landingPagesList: LandingPageItem[] = [
+const fallbackLandingPagesList = [
   {
+    id: "1",
     title: "Summer Sale 2024",
     slug: "/promos/summer-sale-2024",
     status: "published",
@@ -32,6 +27,7 @@ const landingPagesList: LandingPageItem[] = [
     analyticsActive: true,
   },
   {
+    id: "2",
     title: "Back to School",
     slug: "/collections/back-to-school",
     status: "draft",
@@ -42,6 +38,7 @@ const landingPagesList: LandingPageItem[] = [
     analyticsActive: false,
   },
   {
+    id: "3",
     title: "Newborn Essentials",
     slug: "/newborn-essentials",
     status: "published",
@@ -52,6 +49,7 @@ const landingPagesList: LandingPageItem[] = [
     analyticsActive: true,
   },
   {
+    id: "4",
     title: "Winter Outerwear",
     slug: "/winter-collection",
     status: "scheduled",
@@ -64,6 +62,60 @@ const landingPagesList: LandingPageItem[] = [
 ];
 
 export const ExistingPagesList: React.FC = () => {
+  const navigate = useNavigate();
+  const { data: pages = [], isLoading } = useLandingPages();
+  const deleteMutation = useDeleteLandingPage();
+
+  // Pagination states
+  const ITEMS_PER_PAGE = 3;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const handleDelete = (id: string) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this marketing page layout permanently?",
+      )
+    ) {
+      deleteMutation.mutate(id);
+    }
+  };
+
+  // Map to unified layout representation
+  const displayList =
+    pages.length > 0
+      ? pages.map((p) => ({
+          id: p.id || "",
+          title: p.title,
+          slug: p.slug,
+          status: p.active ? "published" : "draft",
+          statusText: p.active ? "Published" : "Draft",
+          statusColor: p.active ? "bg-[#785a00]" : "bg-[#584045]/60",
+          statusBg: p.active
+            ? "bg-[#ffd167]/30 text-[#765900]"
+            : "bg-[#f2f3ff]/60 text-[#584045]/80",
+          lastEdited: p.createdAt
+            ? new Date(p.createdAt).toLocaleDateString()
+            : "Just now",
+          analyticsActive: p.active,
+        }))
+      : fallbackLandingPagesList;
+
+  // Pagination Bounds
+  const totalItems = displayList.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
+  const paginatedList = displayList.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
+
+  if (isLoading) {
+    return (
+      <div className="py-12 text-center text-xs font-semibold text-[#584045]/70 select-none bg-white border border-[#dfbec4]/30 rounded-3xl">
+        Loading existing destinations...
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-3xl border border-[#dfbec4]/30 shadow-sm overflow-hidden h-full">
       {/* Title & Filters */}
@@ -71,14 +123,8 @@ export const ExistingPagesList: React.FC = () => {
         <h4 className="font-display text-base font-extrabold text-[#131b2e]">
           Existing Pages
         </h4>
-
-        <div className="flex gap-2">
-          <button className="p-1.5 hover:bg-[#faf8ff] rounded-lg text-[#584045]/70 transition-colors cursor-pointer">
-            <MdFilterList className="w-5 h-5" />
-          </button>
-          <button className="p-1.5 hover:bg-[#faf8ff] rounded-lg text-[#584045]/70 transition-colors cursor-pointer">
-            <MdSort className="w-5 h-5" />
-          </button>
+        <div className="flex gap-2 text-xs font-bold text-[#584045]/75">
+          Showing {paginatedList.length} items
         </div>
       </div>
 
@@ -94,9 +140,11 @@ export const ExistingPagesList: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-[#dfbec4]/15 text-xs font-semibold text-[#131b2e]">
-            {landingPagesList.map((page, idx) => (
-              <tr key={idx} className="hover:bg-[#faf8ff] transition-colors">
-                {/* Title Slug */}
+            {paginatedList.map((page) => (
+              <tr
+                key={page.id}
+                className="hover:bg-[#faf8ff] transition-colors group"
+              >
                 <td className="px-6 py-4">
                   <div className="flex flex-col">
                     <span className="font-bold text-sm text-[#131b2e]">
@@ -108,7 +156,6 @@ export const ExistingPagesList: React.FC = () => {
                   </div>
                 </td>
 
-                {/* Status Pill */}
                 <td className="px-6 py-4">
                   <span
                     className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider ${page.statusBg}`}
@@ -120,36 +167,33 @@ export const ExistingPagesList: React.FC = () => {
                   </span>
                 </td>
 
-                {/* Last Edited Date */}
                 <td className="px-6 py-4 text-[#584045]/80">
                   {page.lastEdited}
                 </td>
 
-                {/* Action buttons */}
+                {/* Actions */}
                 <td className="px-6 py-4 text-right">
                   <div className="flex items-center justify-end gap-2">
                     <button
-                      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] text-[#584045] transition-all cursor-pointer"
-                      title="Preview"
+                      onClick={() => navigate(`/landing-pages/edit/${page.id}`)}
+                      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] text-[#584045] transition-all cursor-pointer border-none bg-none"
+                      title="Preview details"
                     >
                       <MdVisibility className="w-4.5 h-4.5" />
                     </button>
                     <button
-                      className="w-8 h-8 flex items-center justify-center rounded-full text-[#b31f56] hover:bg-[#ff5c8d]/10 transition-all cursor-pointer"
-                      title="Edit"
+                      onClick={() => navigate(`/landing-pages/edit/${page.id}`)}
+                      className="w-8 h-8 flex items-center justify-center rounded-full text-[#b31f56] hover:bg-[#ff5c8d]/10 transition-all cursor-pointer border-none bg-none"
+                      title="Edit layout details"
                     >
                       <MdEdit className="w-4.5 h-4.5" />
                     </button>
                     <button
-                      className={`w-8 h-8 flex items-center justify-center rounded-full transition-all ${
-                        page.analyticsActive
-                          ? "text-[#006780] hover:bg-[#00a4ca]/10 cursor-pointer"
-                          : "text-[#584045]/30 cursor-not-allowed"
-                      }`}
-                      title="Analytics"
-                      disabled={!page.analyticsActive}
+                      onClick={() => handleDelete(page.id)}
+                      className="w-8 h-8 flex items-center justify-center rounded-full text-[#ba1a1a] hover:bg-[#ffdad6] transition-all cursor-pointer border-none bg-none"
+                      title="Delete Page"
                     >
-                      <MdBarChart className="w-5 h-5" />
+                      <MdDelete className="w-4.5 h-4.5" />
                     </button>
                   </div>
                 </td>
@@ -161,12 +205,24 @@ export const ExistingPagesList: React.FC = () => {
 
       {/* Pagination Footer */}
       <div className="px-6 py-4 bg-[#f2f3ff]/10 border-t border-[#dfbec4]/20 flex items-center justify-between text-xs font-bold text-[#584045]/70 select-none">
-        <span>Showing 4 of 24 pages</span>
+        <span>
+          Showing {currentPage} of {totalPages} pages
+        </span>
         <div className="flex gap-2">
-          <button className="w-8 h-8 flex items-center justify-center rounded-full border border-[#dfbec4]/25 hover:bg-[#faf8ff] text-[#584045] cursor-pointer">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="w-8 h-8 flex items-center justify-center rounded-full border border-[#dfbec4]/25 hover:bg-[#faf8ff] text-[#584045] disabled:opacity-30 cursor-pointer"
+          >
             <MdChevronLeft className="w-4.5 h-4.5" />
           </button>
-          <button className="w-8 h-8 flex items-center justify-center rounded-full border border-[#dfbec4]/25 hover:bg-[#faf8ff] text-[#584045] cursor-pointer">
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            className="w-8 h-8 flex items-center justify-center rounded-full border border-[#dfbec4]/25 hover:bg-[#faf8ff] text-[#584045] disabled:opacity-30 cursor-pointer"
+          >
             <MdChevronRight className="w-4.5 h-4.5" />
           </button>
         </div>

@@ -1,37 +1,65 @@
 import React, { useState } from "react";
-import { MdEvent, MdEdit } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+import { MdEvent, MdEdit, MdDelete } from "react-icons/md";
+import { useBanners, useDeleteBanner } from "../hooks/useBanners";
 
 interface CampaignCard {
+  id: string;
   title: string;
   subtext: string;
   image: string;
 }
 
-const upcomingCampaigns: CampaignCard[] = [
+const fallbackUpcomingCampaigns: CampaignCard[] = [
   {
+    id: "3",
     title: "Back to School 2024",
     subtext: "Starts in 12 days",
     image:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuC8Dbncbk_WMBvrVf525PZj_OsHkNNRyU6YRxFRv7u8dVn1-3J7qUHW1Ad8LlPqGFDYH8m84cD3OlAFAEqYVJqtm_HJ7jKpxRlBbaeMPtBuVMWs9Jj_RlM_Wxpmf5g_C7O7dBdC2234V_aSnqqZTdwuQpr9OopVzLR1cfm_b_pZgmnfcOYPwXjnK0MrwHDxoGegPRzrAXiWtkjdqj6w0eX6SQFE5u3Gg-Ii0P9FagNHKd7JpVWzQBNdcX7H8_ywXmxnUG1eQxI5Oucd",
   },
   {
+    id: "4",
     title: "New Arrival: Baby Gifts",
     subtext: "Starts in 5 days",
     image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuC-g0VoPXI66NXIcUoobLnbgN5raW1wauBiBNGmOpv6pFQ-FR7kcddkQaxTUYyAWwWv-kvfaUnzOYyocNeGadiHEqYSO3GX-UDo1SAjGDWurkAPIVdiZ4GW0ccTsIC6PFIC_9Np7IjHsDaVRMjir3qVdX1HcTPbgnXyZ3XT3sAjQsnoTclksyvScBnPX7t20k0HC8REo2KZ5KRmTw1sfsYyxxzFQH7ij3cbcGheeDCiiHwF7r9kTA7jXNmDusZ6xD5jxahaFtKGSgGR",
-  },
-  {
-    title: "Outdoor Play Collection",
-    subtext: "Starts in 18 days",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDgPq__ujJDvIjEWDjDuI-hI1vgf6h2ZzIT1RBE4XPsN6ntTc85KQwbbZyvROq5tODI64Jm7LlDEIjJu86KQgkrjT4M-JAGhkOq7_--KPwCnkTcIH7Qk5kaqfxECfi5LupV0z_5M_z9TMWqW7Ffva-tEGOWBmE84uBmgwVcOaKZ5hOh2Pql05Zrjk07HcfTbPOeAf3C85il1RWInQu7x0cdUEDqffRjfUj3BtCLo4pry6a_ZDs3JhcJq4fUAYgelQXBzG7ThuPMkOxh",
+      "https://lh3.googleusercontent.com/aida-public/AB6AXu-g0VoPXI66NXIcUoobLnbgN5raW1wauBiBNGmOpv6pFQ-FR7kcddkQaxTUYyAWwWv-kvfaUnzOYyocNeGadiHEqYSO3GX-UDo1SAjGDWurkAPIVdiZ4GW0ccTsIC6PFIC_9Np7IjHsDaVRMjir3qVdX1HcTPbgnXyZ3XT3sAjQsnoTclksyvScBnPX7t20k0HC8REo2KZ5KRmTw1sfsYyxxzFQH7ij3cbcGheeDCiiHwF7r9kTA7jXNmDusZ6xD5jxahaFtKGSgGR",
   },
 ];
 
 export const UpcomingExpiredTabs: React.FC = () => {
+  const navigate = useNavigate();
+  const { data: banners = [] } = useBanners();
+  const deleteMutation = useDeleteBanner();
+
   const [activeTab, setActiveTab] = useState<"upcoming" | "expired">(
     "upcoming",
   );
+
+  const handleDelete = (id: string) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this draft/paused banner request?",
+      )
+    ) {
+      deleteMutation.mutate(id);
+    }
+  };
+
+  // Map paused draft/inactive banners to upcoming lists
+  const displayList =
+    banners.length > 0
+      ? banners
+          .filter((b) => !b.active)
+          .map((b) => ({
+            id: b.id || "",
+            title: b.title,
+            subtext: `Paused / Position: ${b.position}`,
+            image:
+              b.image ||
+              "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=150&q=80",
+          }))
+      : fallbackUpcomingCampaigns;
 
   return (
     <div className="space-y-6">
@@ -39,33 +67,33 @@ export const UpcomingExpiredTabs: React.FC = () => {
       <div className="flex items-center gap-6 border-b border-[#dfbec4]/30 select-none">
         <button
           onClick={() => setActiveTab("upcoming")}
-          className={`pb-3 px-1 font-bold text-xs transition-all cursor-pointer ${
+          className={`pb-3 px-1 font-bold text-xs transition-all cursor-pointer border-none bg-none ${
             activeTab === "upcoming"
-              ? "text-[#b31f56] border-b-2 border-[#b31f56]"
+              ? "text-[#b31f56] border-b-2 border-b-[#b31f56]"
               : "text-[#584045]/70 hover:text-[#131b2e]"
           }`}
         >
-          Upcoming (4)
+          Draft &amp; Paused Campaigns ({displayList.length})
         </button>
         <button
           onClick={() => setActiveTab("expired")}
-          className={`pb-3 px-1 font-bold text-xs transition-all cursor-pointer ${
+          className={`pb-3 px-1 font-bold text-xs transition-all cursor-pointer border-none bg-none ${
             activeTab === "expired"
-              ? "text-[#b31f56] border-b-2 border-[#b31f56]"
+              ? "text-[#b31f56] border-b-2 border-b-[#b31f56]"
               : "text-[#584045]/70 hover:text-[#131b2e]"
           }`}
         >
-          Expired (28)
+          Expired Archives (28)
         </button>
       </div>
 
       {/* Campaign Cards layout Grid */}
       {activeTab === "upcoming" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {upcomingCampaigns.map((camp, idx) => (
+          {displayList.map((camp) => (
             <div
-              key={idx}
-              className="glass-panel bg-white/70 rounded-2xl p-4 flex gap-4 items-center border border-[#dfbec4]/30 border-l-4 border-l-[#ffd167] shadow-sm hover:shadow-md transition-shadow"
+              key={camp.id}
+              className="glass-panel bg-white/70 rounded-2xl p-4 flex gap-4 items-center border border-[#dfbec4]/30 border-l-4 border-l-[#ffd167] shadow-sm hover:shadow-md transition-shadow group"
             >
               <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-[#f2f3ff] border border-[#dfbec4]/20 select-none">
                 <img
@@ -85,9 +113,22 @@ export const UpcomingExpiredTabs: React.FC = () => {
                 </p>
               </div>
 
-              <button className="w-8 h-8 rounded-full hover:bg-[#faf8ff] text-[#584045] flex items-center justify-center shrink-0 transition-colors cursor-pointer select-none">
-                <MdEdit className="w-4.5 h-4.5" />
-              </button>
+              <div className="flex flex-col gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={() => navigate(`/banner/edit/${camp.id}`)}
+                  className="w-7 h-7 rounded-full hover:bg-[#faf8ff] text-[#584045] flex items-center justify-center transition-colors cursor-pointer border-none bg-none"
+                  title="Edit details"
+                >
+                  <MdEdit className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleDelete(camp.id)}
+                  className="w-7 h-7 rounded-full hover:bg-[#ffdad6] text-[#ba1a1a] flex items-center justify-center transition-colors cursor-pointer border-none bg-none"
+                  title="Delete post permanently"
+                >
+                  <MdDelete className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           ))}
         </div>

@@ -10,36 +10,60 @@ import {
   MdDirectionsWalk,
   MdSmartToy,
 } from "react-icons/md";
+import type { Customer } from "../services/customerService";
 
-export const CustomerProfileCard: React.FC = () => {
+interface CustomerProfileCardProps {
+  customer: Customer;
+}
+
+export const CustomerProfileCard: React.FC<CustomerProfileCardProps> = ({
+  customer,
+}) => {
+  const isVip = customer.totalSpent > 1000;
+  const initials = customer.name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
+
   return (
     <div className="space-y-6">
       {/* Summary Profile Detail Info */}
       <div className="bg-white rounded-3xl p-8 border border-[#dfbec4]/30 shadow-sm text-center relative overflow-hidden select-none">
         {/* VIP badge top right */}
-        <div className="absolute top-6 right-6">
-          <span className="bg-[#ffd167] text-[#765900] px-4 py-1 rounded-full font-bold text-[10px] flex items-center gap-1">
-            <MdStar className="w-3.5 h-3.5" /> VIP Member
-          </span>
-        </div>
+        {isVip && (
+          <div className="absolute top-6 right-6">
+            <span className="bg-[#ffd167] text-[#765900] px-4 py-1 rounded-full font-bold text-[10px] flex items-center gap-1">
+              <MdStar className="w-3.5 h-3.5" /> VIP Member
+            </span>
+          </div>
+        )}
 
         {/* Profile Avatar verified status */}
         <div className="relative inline-block mb-6 mt-4">
-          <img
-            className="w-32 h-32 rounded-full border-4 border-[#ffd9df] p-1 object-cover"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqtQJy-nVpAERk9w-zpWSQKEXS3pLh-0S-SgSc6KOAj9QxPfOEM6DytCHvPJPwWBiWnjD76pCcCRjILPLmHDXRu_xqVs4K-dfKJJIJaTpMiZDPoHmbVgBgCH1J0cckIOH0I4rtaK7Q8vEiu32fXZWrh-J1m8k9H6RfVBkeb8eBi9s53Ustrd3n987Bzzr3tLaZxweuw6x858EphgiCQlUONqUxkOxfTV2HKxdDBodtjrlVc-wxKU9XFVDqz3KqMAQLYzl4oy-pWkVQ"
-            alt="Eleanor Mason"
-          />
+          {customer.avatar ? (
+            <img
+              className="w-32 h-32 rounded-full border-4 border-[#ffd9df] p-1 object-cover bg-white"
+              src={customer.avatar}
+              alt={customer.name}
+            />
+          ) : (
+            <div className="w-32 h-32 rounded-full border-4 border-[#ffd9df] flex items-center justify-center font-display text-4xl font-extrabold text-[#765900] bg-[#ffd167]/30 select-none">
+              {initials}
+            </div>
+          )}
           <div className="absolute bottom-1 right-1 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md border border-[#dfbec4]/10">
             <MdVerified className="text-[#b31f56] w-5 h-5" />
           </div>
         </div>
 
         <h3 className="font-display text-lg font-extrabold text-[#131b2e] mb-1">
-          Eleanor Mason
+          {customer.name}
         </h3>
         <p className="text-xs font-bold text-[#584045]/60 mb-6">
-          Customer since Sept 2021
+          Status:{" "}
+          <span className="uppercase text-[#b31f56]">{customer.status}</span>
         </p>
 
         {/* LTV & Orders metrics */}
@@ -48,13 +72,17 @@ export const CustomerProfileCard: React.FC = () => {
             <p className="text-[9px] font-extrabold text-[#584045]/60 uppercase tracking-widest mb-1">
               Total Orders
             </p>
-            <p className="text-2xl font-extrabold text-[#b31f56]">42</p>
+            <p className="text-2xl font-extrabold text-[#b31f56]">
+              {customer.notes?.length || 14}
+            </p>
           </div>
           <div>
             <p className="text-[9px] font-extrabold text-[#584045]/60 uppercase tracking-widest mb-1">
               Lifetime Value
             </p>
-            <p className="text-2xl font-extrabold text-[#785a00]">$3,842</p>
+            <p className="text-2xl font-extrabold text-[#785a00]">
+              ${customer.totalSpent.toLocaleString()}
+            </p>
           </div>
         </div>
 
@@ -62,11 +90,11 @@ export const CustomerProfileCard: React.FC = () => {
         <div className="pt-6 space-y-4 text-left text-xs font-semibold text-[#131b2e]">
           <div className="flex items-center gap-3">
             <MdAlternateEmail className="text-[#ff5c8d] w-4.5 h-4.5 shrink-0" />
-            <span>eleanor.m@example.com</span>
+            <span className="truncate">{customer.email}</span>
           </div>
           <div className="flex items-center gap-3">
             <MdSmartphone className="text-[#ff5c8d] w-4.5 h-4.5 shrink-0" />
-            <span>+1 (555) 012-3456</span>
+            <span>{customer.phone || "No phone registered"}</span>
           </div>
           <div className="flex items-center gap-3">
             <MdLocationOn className="text-[#ff5c8d] w-4.5 h-4.5 shrink-0" />

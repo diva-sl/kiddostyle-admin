@@ -1,7 +1,11 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { MdShoppingBag, MdPersonAdd, MdStar, MdLoyalty } from "react-icons/md";
+import { useCustomers } from "../hooks/useCustomers";
+import type { Customer } from "../services/customerService";
 
 interface SpenderItem {
+  id: string;
   name: string;
   detail: string;
   total: string;
@@ -18,8 +22,9 @@ interface ActivityItem {
   iconColor: string;
 }
 
-const spendersList: SpenderItem[] = [
+const fallbackSpenders: SpenderItem[] = [
   {
+    id: "1",
     name: "Emilia Clarke",
     detail: "Joined Jan 2023 • 12 Orders",
     total: "$2,140.50",
@@ -29,6 +34,7 @@ const spendersList: SpenderItem[] = [
       "https://lh3.googleusercontent.com/aida-public/AB6AXuB-h0MnvO1cpTI0LqXcO0mE0u5xfnQf0TOHFwJa_XWmMiFuKpOuQd29ybh7xbsXvETPywd1evUyCA-s1Y_dSLICJFuhwVxNDM85mzkXRaUEfK2z59bGseKpM3-e7PDO0bUxRCbvxG2lM0Fd55mmQTC8Eb-c2Rk7Vb4oxT-5Ar4LGPlzaefeMBaLa6yd_50-ghqa4LuLo1HXUR_ruGmG3scoa2-Ov6dNKnf3CXeDmQxPjA9L_0HKsOzlWeYt4sA9MLksLkumYj7aw6ev",
   },
   {
+    id: "2",
     name: "Marcus Henderson",
     detail: "Joined Mar 2023 • 8 Orders",
     total: "$1,892.00",
@@ -38,6 +44,7 @@ const spendersList: SpenderItem[] = [
       "https://lh3.googleusercontent.com/aida-public/AB6AXuDd2IvsGZjc0G_RFjaHrDbmGH2uUonViheyF7phXBtglKpHkAgQUDLglxiMbkmoCz6pEWTx7ZSgm4L6SBlJBJgVKnx2EY0tCONxklIbVyZLn7uz7hGUkl-kGeyLxqkqRfmdBP3Z_W9rRgzgQpCBn1rZZRcdqFEkGhSz3TkrVC1l0U2ZpNu6H5CZVTLiaZee_X9rGmyTLpyZYlA797KcSF6ceBUQ4IRzFodjdS9Ja5HrmvxI9xybNCUr-OqfGhKwhg0N1ixNb-yTO18i",
   },
   {
+    id: "3",
     name: "Sofia Rodriguez",
     detail: "Joined June 2022 • 15 Orders",
     total: "$1,450.20",
@@ -50,8 +57,8 @@ const spendersList: SpenderItem[] = [
 
 const activityList: ActivityItem[] = [
   {
-    title: "New Order #48291",
-    description: "Emilia Clarke spent $142.00",
+    title: "New Order Resolved",
+    description: "Eleanor Mason spent $142.00",
     time: "2 minutes ago",
     icon: <MdShoppingBag className="w-4 h-4" />,
     iconColor: "bg-[#ffd9df] text-[#b31f56]",
@@ -72,7 +79,7 @@ const activityList: ActivityItem[] = [
   },
   {
     title: "Milestone Reached",
-    description: "Sofia Rodriguez moved to Platinum",
+    description: "Sophia Rodriguez moved to Platinum",
     time: "5 hours ago",
     icon: <MdLoyalty className="w-4 h-4" />,
     iconColor: "bg-[#f2f3ff] text-[#584045]",
@@ -80,23 +87,52 @@ const activityList: ActivityItem[] = [
 ];
 
 export const TopSpendersActivity: React.FC = () => {
+  const navigate = useNavigate();
+  const { data: customers = [] } = useCustomers();
+
+  // Sort by spent desc to display top spenders dynamically
+  const displaySpenders: SpenderItem[] =
+    customers.length > 0
+      ? [...customers]
+          .sort((a, b) => b.totalSpent - a.totalSpent)
+          .slice(0, 3)
+          .map((c) => ({
+            id: c.id || "",
+            name: c.name,
+            detail: `Joined ${new Date(c.joinedDate || Date.now()).toLocaleDateString("en-US", { month: "short", year: "numeric" })} • Active`,
+            total: `$${c.totalSpent.toLocaleString()}`,
+            badge: c.totalSpent > 1000 ? "VIP Member" : "Verified Customer",
+            badgeColor:
+              c.totalSpent > 1000
+                ? "bg-[#ffd9df] text-[#b31f56]"
+                : "bg-[#00a4ca]/10 text-[#006780]",
+            image:
+              c.avatar ||
+              "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+          }))
+      : fallbackSpenders;
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-      {/* Top spenders card details (col-span-2) */}
-      <div className="lg:col-span-2 bg-white p-6 rounded-[2rem] border border-[#dfbec4]/30 shadow-sm select-none flex flex-col justify-between">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch select-none">
+      {/* Top spenders card details */}
+      <div className="lg:col-span-2 bg-white p-6 rounded-[2rem] border border-[#dfbec4]/30 shadow-sm flex flex-col justify-between">
         <div className="flex justify-between items-center mb-6">
           <h4 className="font-display text-sm font-extrabold text-[#131b2e]">
             Top Spenders
           </h4>
-          <button className="text-[#b31f56] font-bold text-xs hover:underline cursor-pointer">
+          <button
+            onClick={() => navigate("/customers")}
+            className="text-[#b31f56] font-bold text-xs hover:underline cursor-pointer"
+          >
             View All
           </button>
         </div>
 
         <div className="space-y-4">
-          {spendersList.map((user, idx) => (
+          {displaySpenders.map((user) => (
             <div
-              key={idx}
+              key={user.id}
+              onClick={() => navigate(`/customers/${user.id}`)}
               className="flex items-center justify-between p-4 bg-[#faf8ff] rounded-2xl border border-[#dfbec4]/10 hover:bg-[#f2f3ff]/40 transition-colors group cursor-pointer"
             >
               <div className="flex items-center gap-3">
@@ -131,7 +167,7 @@ export const TopSpendersActivity: React.FC = () => {
         </div>
       </div>
 
-      {/* Recent activity timeline cards (col-span-1) */}
+      {/* Recent activity timeline cards */}
       <div className="lg:col-span-1 bg-white p-6 rounded-[2rem] border border-[#dfbec4]/30 shadow-sm flex flex-col select-none">
         <h4 className="font-display text-sm font-extrabold text-[#131b2e] mb-6">
           Recent Activity
@@ -140,7 +176,6 @@ export const TopSpendersActivity: React.FC = () => {
         <div className="space-y-6 flex-grow">
           {activityList.map((item, idx) => (
             <div key={idx} className="flex gap-4 items-start relative">
-              {/* Timeline dot connector link */}
               <div className="flex flex-col items-center shrink-0">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center ${item.iconColor} z-10`}

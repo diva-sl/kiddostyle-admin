@@ -1,8 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { MdPayments } from "react-icons/md";
+import { ProductFormContext } from "../context/ProductFormContext";
 
 export const ProductPricingInventory: React.FC = () => {
   const [trackInventory, setTrackInventory] = useState(true);
+  const context = useContext(ProductFormContext);
+  if (!context) return null;
+
+  const { formState, setFormState } = context;
 
   return (
     <section className="bg-white p-6 rounded-2xl border border-[#dfbec4]/30 shadow-sm space-y-6">
@@ -23,6 +28,13 @@ export const ProductPricingInventory: React.FC = () => {
             <input
               type="number"
               placeholder="0.00"
+              value={formState.price || ""}
+              onChange={(e) =>
+                setFormState((prev) => ({
+                  ...prev,
+                  price: Number(e.target.value),
+                }))
+              }
               className="w-full bg-[#f2f3ff] border-none rounded-xl py-3 pl-8 pr-3 focus:ring-4 focus:ring-[#b31f56]/10 outline-none text-[#131b2e] text-sm"
             />
           </div>
@@ -30,7 +42,7 @@ export const ProductPricingInventory: React.FC = () => {
 
         <div>
           <label className="block text-xs font-bold text-[#584045]/70 uppercase tracking-wider mb-2">
-            Sale Price
+            Sale / Discount Price
           </label>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#584045]/50 font-bold">
@@ -39,6 +51,13 @@ export const ProductPricingInventory: React.FC = () => {
             <input
               type="number"
               placeholder="0.00"
+              value={formState.originalPrice || ""}
+              onChange={(e) =>
+                setFormState((prev) => ({
+                  ...prev,
+                  originalPrice: Number(e.target.value),
+                }))
+              }
               className="w-full bg-[#f2f3ff] border-none rounded-xl py-3 pl-8 pr-3 focus:ring-4 focus:ring-[#b31f56]/10 outline-none text-[#131b2e] text-sm"
             />
           </div>
@@ -71,7 +90,13 @@ export const ProductPricingInventory: React.FC = () => {
               </label>
               <input
                 type="number"
-                defaultValue={0}
+                value={formState.stock}
+                onChange={(e) =>
+                  setFormState((prev) => ({
+                    ...prev,
+                    stock: Number(e.target.value),
+                  }))
+                }
                 className="w-full bg-[#f2f3ff] border-none rounded-xl p-3 focus:ring-4 focus:ring-[#b31f56]/10 outline-none text-[#131b2e] text-sm"
               />
             </div>

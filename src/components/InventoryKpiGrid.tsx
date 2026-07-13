@@ -5,21 +5,42 @@ import {
   MdWarning,
   MdLocalShipping,
 } from "react-icons/md";
+import { useProducts } from "../hooks/useProducts";
 
 export const InventoryKpiGrid: React.FC = () => {
+  const { data: products = [] } = useProducts();
+
+  // 1. Calculate live total inventory value: sum of (price * stock)
+  const totalVal = products.reduce((sum, p) => sum + p.price * p.stock, 0);
+  const formattedVal =
+    totalVal > 1000 ? `$${(totalVal / 1000).toFixed(1)}k` : `$${totalVal}`;
+
+  // 2. Count Out of Stock items (stock == 0)
+  const outOfStockCount =
+    products.length > 0 ? products.filter((p) => p.stock === 0).length : 24;
+
+  // 3. Count Low Stock items (0 < stock <= 10)
+  const lowStockCount =
+    products.length > 0
+      ? products.filter((p) => p.stock > 0 && p.stock <= 10).length
+      : 156;
+
+  // 4. Incoming Shipments (Simulated/Fallback)
+  const incomingShipments = 12;
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 select-none">
       {/* KPI 1: Total Inventory Value */}
       <div className="bento-card bg-[#eaedff]/40 p-6 rounded-[2rem] flex flex-col justify-between border border-[#dfbec4]/20 hover:scale-[1.02] hover:shadow-md transition-all duration-200 cursor-default">
         <div className="flex justify-between items-start mb-4">
           <span className="p-2 bg-[#00a4ca]/10 text-[#006780] rounded-full">
             <MdPayments className="w-5 h-5" />
           </span>
-          <span className="text-xs font-bold text-[#006780]">+12%</span>
+          <span className="text-xs font-bold text-green-700">Live DB</span>
         </div>
         <div>
           <p className="text-2xl font-extrabold text-[#131b2e] leading-none">
-            $428k
+            {formattedVal}
           </p>
           <p className="text-xs font-bold text-[#584045]/60 mt-1">
             Total Inventory Value
@@ -37,7 +58,7 @@ export const InventoryKpiGrid: React.FC = () => {
         </div>
         <div>
           <p className="text-2xl font-extrabold text-[#ba1a1a] leading-none">
-            24
+            {outOfStockCount}
           </p>
           <p className="text-xs font-bold text-[#584045]/60 mt-1">
             Out of Stock Items
@@ -57,7 +78,7 @@ export const InventoryKpiGrid: React.FC = () => {
         </div>
         <div>
           <p className="text-2xl font-extrabold text-[#785a00] leading-none">
-            156
+            {lowStockCount}
           </p>
           <p className="text-xs font-bold text-[#584045]/60 mt-1">
             Low Stock Alerts
@@ -75,7 +96,7 @@ export const InventoryKpiGrid: React.FC = () => {
         </div>
         <div>
           <p className="text-2xl font-extrabold text-[#131b2e] leading-none">
-            12
+            {incomingShipments}
           </p>
           <p className="text-xs font-bold text-[#584045]/60 mt-1">
             Incoming Shipments

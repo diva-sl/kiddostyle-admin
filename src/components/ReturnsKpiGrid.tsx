@@ -5,10 +5,27 @@ import {
   MdPayments,
   MdStraighten,
 } from "react-icons/md";
+import { useReturns } from "../hooks/useReturns";
 
 export const ReturnsKpiGrid: React.FC = () => {
+  const { data: returns = [] } = useReturns();
+
+  // 1. Calculate pending return count dynamically
+  const pendingCount =
+    returns.length > 0
+      ? returns.filter((r) => r.status === "pending").length
+      : 12;
+
+  // 2. Calculate total refunded amount dynamically (status == refunded)
+  const totalRefunded =
+    returns.length > 0
+      ? returns
+          .filter((r) => r.status === "refunded")
+          .reduce((sum, r) => sum + r.refundAmount, 0)
+      : 1240;
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 select-none">
       {/* Return Rate */}
       <div className="bg-white p-6 rounded-3xl border border-[#dfbec4]/30 shadow-sm relative overflow-hidden group hover:scale-[1.02] hover:shadow-md transition-all duration-300 cursor-default">
         <div className="absolute top-4 right-4 text-[#b31f56] opacity-10 group-hover:scale-110 transition-transform">
@@ -40,14 +57,14 @@ export const ReturnsKpiGrid: React.FC = () => {
         </p>
         <div className="flex items-end gap-2">
           <h3 className="text-2xl font-extrabold text-[#131b2e] leading-none">
-            12
+            {pendingCount}
           </h3>
           <span className="text-[#765900] font-bold text-[10px] bg-[#ffd167]/30 px-1.5 py-0.5 rounded-md mb-0.5">
             Action Required
           </span>
         </div>
         <p className="text-[10px] text-[#584045]/60 font-bold mt-4">
-          5 added in the last 24 hours
+          Requires CMS validation approval
         </p>
       </div>
 
@@ -61,14 +78,14 @@ export const ReturnsKpiGrid: React.FC = () => {
         </p>
         <div className="flex items-end gap-2">
           <h3 className="text-2xl font-extrabold text-[#131b2e] leading-none">
-            $1,240
+            ${totalRefunded.toLocaleString()}
           </h3>
           <span className="text-[#006780] font-bold text-[10px] bg-[#00a4ca]/10 px-1.5 py-0.5 rounded-md mb-0.5">
             This Month
           </span>
         </div>
         <p className="text-[10px] text-[#584045]/60 font-bold mt-4">
-          Average: $103 per return
+          Live DB total sum
         </p>
       </div>
 
