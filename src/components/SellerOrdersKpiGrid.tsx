@@ -5,8 +5,37 @@ import {
   MdCheckCircle,
   MdPayments,
 } from "react-icons/md";
+import { useOrders } from "../hooks/useOrders";
 
-export const SellerOrdersKpiGrid: React.FC = () => {
+interface SellerOrdersKpiGridProps {
+  sellerId?: string;
+}
+
+export const SellerOrdersKpiGrid: React.FC<SellerOrdersKpiGridProps> = ({
+  sellerId,
+}) => {
+  const { data: dbOrders = [] } = useOrders(
+    sellerId ? { sellerId } : undefined,
+  );
+
+  const pendingCount =
+    dbOrders.length > 0
+      ? dbOrders.filter((o) => o.status === "pending").length
+      : 24;
+  const shippedCount =
+    dbOrders.length > 0
+      ? dbOrders.filter((o) => o.status === "shipped").length
+      : 18;
+  const deliveredCount =
+    dbOrders.length > 0
+      ? dbOrders.filter((o) => o.status === "delivered").length
+      : 42;
+
+  const dailyRevenue =
+    dbOrders.length > 0
+      ? dbOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0)
+      : 2840;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 select-none">
       {/* Pending Orders */}
@@ -18,7 +47,9 @@ export const SellerOrdersKpiGrid: React.FC = () => {
           <span className="text-[10px] font-bold text-[#584045]/60">+12%</span>
         </div>
         <div>
-          <p className="text-2xl font-extrabold text-[#131b2e]">24</p>
+          <p className="text-2xl font-extrabold text-[#131b2e]">
+            {pendingCount}
+          </p>
           <p className="text-[10px] font-bold text-[#584045]/60 uppercase tracking-wider mt-0.5">
             Pending Orders
           </p>
@@ -36,7 +67,9 @@ export const SellerOrdersKpiGrid: React.FC = () => {
           </span>
         </div>
         <div>
-          <p className="text-2xl font-extrabold text-[#131b2e]">18</p>
+          <p className="text-2xl font-extrabold text-[#131b2e]">
+            {shippedCount}
+          </p>
           <p className="text-[10px] font-bold text-[#584045]/60 uppercase tracking-wider mt-0.5">
             In Transit
           </p>
@@ -54,7 +87,9 @@ export const SellerOrdersKpiGrid: React.FC = () => {
           </span>
         </div>
         <div>
-          <p className="text-2xl font-extrabold text-[#131b2e]">42</p>
+          <p className="text-2xl font-extrabold text-[#131b2e]">
+            {deliveredCount}
+          </p>
           <p className="text-[10px] font-bold text-[#584045]/60 uppercase tracking-wider mt-0.5">
             Delivered Today
           </p>
@@ -68,11 +103,17 @@ export const SellerOrdersKpiGrid: React.FC = () => {
             <MdPayments className="w-5 h-5" />
           </div>
           <span className="text-[10px] font-bold text-[#584045]/60">
-            $12.4k total
+            Live total
           </span>
         </div>
         <div>
-          <p className="text-2xl font-extrabold text-[#131b2e]">$2,840</p>
+          <p className="text-2xl font-extrabold text-[#131b2e]">
+            $
+            {dailyRevenue.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </p>
           <p className="text-[10px] font-bold text-[#584045]/60 uppercase tracking-wider mt-0.5">
             Daily Revenue
           </p>

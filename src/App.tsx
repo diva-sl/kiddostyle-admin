@@ -44,6 +44,7 @@ import { BlogDetailsPage } from "./pages/BlogDetails";
 import { AddBlogPostPage } from "./pages/AddBlogPost";
 import { AddBannerPage } from "./pages/AddBanner";
 import { AddLandingPage } from "./pages/AddLandingPage";
+import { AddRolePage } from "./pages/AddRole";
 
 export default function App() {
   const token = localStorage.getItem("token");
@@ -194,6 +195,33 @@ export default function App() {
               path="/analytics"
               element={<Navbar title="Analytics Overview" />}
             />
+            <Route
+              path="/roles/new"
+              element={<Navbar title="Add New Role" />}
+            />
+            <Route
+              path="/roles/edit/:id"
+              element={<Navbar title="Edit Role Details" />}
+            />
+
+            {/* Seller Portal Header Navbar Titles */}
+            <Route
+              path="/seller"
+              element={<Navbar title="Seller Dashboard" />}
+            />
+            <Route
+              path="/seller/products"
+              element={<Navbar title="Seller Inventory" />}
+            />
+            <Route
+              path="/seller/orders"
+              element={<Navbar title="Seller Orders" />}
+            />
+            <Route
+              path="/seller/payments"
+              element={<Navbar title="Seller Payments" />}
+            />
+
             <Route path="*" element={<Navbar title="CMS Dashboard" />} />
           </Routes>
 
@@ -209,7 +237,6 @@ export default function App() {
               <Route path="/orders" element={<OrdersPage />} />
               <Route path="/orders/new" element={<AddOrderPage />} />
               <Route path="/orders/:id" element={<OrderDetailsPage />} />
-              {/* Category Page Forms mapping */}
               <Route path="/categories" element={<CategoriesPage />} />
               <Route path="/categories/new" element={<AddCategoryPage />} />
               <Route
@@ -237,6 +264,8 @@ export default function App() {
               />
               <Route path="/seller/payments" element={<SellerPaymentsPage />} />
               <Route path="/roles" element={<RolesPage />} />
+              <Route path="/roles/new" element={<AddRolePage />} />
+              <Route path="/roles/edit/:id" element={<AddRolePage />} />
               <Route path="/analytics" element={<AnalyticsPage />} />
               <Route path="/coupons" element={<CouponsPage />} />
               <Route path="/coupons/new" element={<AddCouponPage />} />

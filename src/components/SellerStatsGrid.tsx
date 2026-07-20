@@ -1,7 +1,30 @@
 import React from "react";
 import { MdPayments, MdShoppingBag, MdInventory, MdStar } from "react-icons/md";
+import { useOrders } from "../hooks/useOrders";
+import { useProducts } from "../hooks/useProducts";
 
 export const SellerStatsGrid: React.FC = () => {
+  const { data: orders = [] } = useOrders();
+  const { data: products = [] } = useProducts();
+
+  // Calculate Today's Sales
+  const totalSales =
+    orders.length > 0
+      ? orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0)
+      : 1420.5;
+
+  // Calculate Pending Orders
+  const pendingOrdersCount =
+    orders.length > 0
+      ? orders.filter((o) => o.status === "pending").length
+      : 24;
+
+  // Calculate Low Stock Count (stock <= 5)
+  const lowStockCount =
+    products.length > 0
+      ? products.filter((p) => (p.stock || 0) <= 5).length
+      : 8;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 select-none">
       {/* Today's Sales */}
@@ -15,9 +38,15 @@ export const SellerStatsGrid: React.FC = () => {
           </span>
         </div>
         <p className="text-[10px] font-bold text-[#584045]/60 mb-1 uppercase tracking-wider">
-          Today's Sales
+          Total Store Sales
         </p>
-        <h3 className="text-2xl font-extrabold text-[#131b2e]">$1,420.50</h3>
+        <h3 className="text-2xl font-extrabold text-[#131b2e]">
+          $
+          {totalSales.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+        </h3>
       </div>
 
       {/* Pending Orders */}
@@ -33,7 +62,9 @@ export const SellerStatsGrid: React.FC = () => {
         <p className="text-[10px] font-bold text-[#584045]/60 mb-1 uppercase tracking-wider">
           Pending Orders
         </p>
-        <h3 className="text-2xl font-extrabold text-[#131b2e]">24</h3>
+        <h3 className="text-2xl font-extrabold text-[#131b2e]">
+          {pendingOrdersCount}
+        </h3>
       </div>
 
       {/* Low Stock */}
@@ -46,7 +77,9 @@ export const SellerStatsGrid: React.FC = () => {
         <p className="text-[10px] font-bold text-[#584045]/60 mb-1 uppercase tracking-wider">
           Low Stock Alerts
         </p>
-        <h3 className="text-2xl font-extrabold text-[#131b2e]">8 items</h3>
+        <h3 className="text-2xl font-extrabold text-[#131b2e]">
+          {lowStockCount} items
+        </h3>
       </div>
 
       {/* Avg. Rating */}

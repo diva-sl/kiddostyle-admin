@@ -2,10 +2,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orderService } from "../services/orderService";
 import type { Order } from "../services/orderService";
 
-export const useOrders = () => {
+export const useOrders = (params?: { sellerId?: string }) => {
   return useQuery({
-    queryKey: ["orders"],
-    queryFn: orderService.getOrders,
+    queryKey: ["orders", params],
+    queryFn: () => orderService.getOrders(params),
   });
 };
 

@@ -1,35 +1,54 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { MdAdd } from "react-icons/md";
+import { useProducts } from "../hooks/useProducts";
 
-interface StockWarningItem {
-  title: string;
-  left: string;
-  image: string;
-}
-
-const stockWarnings: StockWarningItem[] = [
+const fallbackStockWarnings = [
   {
+    id: "1",
     title: "Organic Cotton Ribbed Sweater",
     left: "2 units left",
     image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuB0ee3YzwLQrIvhMdpbxyMnCCQdDfcwRc_nlabgWlcuaACwwW1xcnNz6nlWeEasjvw_NVC2bhrukH-zHmWF16VOytTzIcyayuZzxLcvzxzF-TvRPDg5DLrokj3M_jTHFpLqXeSVnDUWW0wDC6pBjSJ_I_PtNx3sO7n3-cjPPdj1Au6fLjd_SEtPh-nruSC9irlDnb0xivxoAKOypylD_mJQmgmAjJaU9x59zlOMB9RD1IjVoIJWwfCkBrTpNfClpKaR_TMhxJZR53V8",
+      "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=150&q=80",
   },
   {
+    id: "2",
     title: "Linen Overalls - Olive",
     left: "5 units left",
     image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCvPuWXrETKEoJEGhmgJUNaYwhtO7bRJJ-NAqCOaUiTFMHcO4ypyfULQaNSUb97tFB4xKXXLCxP5ynTaenzWuvQ_5W_1qdiix1r66_xHuOFa66mJGG1ekI6Kw3Wpi--pPLy_BNuW2g4v_-0V_bLXdJF_Al0d2D8hRMcTvpmT6ebSwLpX6clAIpAOGHPEE5RuFBNklGtZNsc41e5JytVJ-KzEk8qpFb9QEVtonPD9iv5WEtwTrMuRT0TBOKCzWcg8DuT7SzayjXzZHPs",
+      "https://images.unsplash.com/photo-1519457431-44ccd64a579b?auto=format&fit=crop&w=150&q=80",
   },
   {
+    id: "3",
     title: "Leather T-Strap Shoes",
     left: "3 units left",
     image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDD-CypIAW_rI5j4v_6lHqlwTf3HBrB-PHZ7m2-5Qnt8YyI0hI6EvQR7NHN5ZlHUZHknghHh81L_CKnV_ZVT1JVATsX2LZNdBuXBJpDroO4Thm2HYSnxUjSU6lg_N3_OuK9c8YKR-BYnO4skUGADrWG8FstFqT6lI16Rr5IkaUa9SKn-k4I0Z3_7aUYp2HqfmuUJm7lYK8th1rX-FD_44n02U0nSidtpkATlmeokM04QHPrd9m_DxdU48qQavsDpW4alQw6VBcW-CuH",
+      "https://images.unsplash.com/photo-1515488042361-404e9250afef?auto=format&fit=crop&w=150&q=80",
   },
 ];
 
 export const SellerRevenueStock: React.FC = () => {
+  const navigate = useNavigate();
+  const { data: products = [] } = useProducts();
   const [tab, setTab] = useState<"week" | "month">("week");
+
+  // Filter low stock items from live products collection
+  const lowStockItems =
+    products.length > 0
+      ? products
+          .filter((p) => (p.stock || 0) <= 5)
+          .map((p) => ({
+            id: p.id || "",
+            title: p.name,
+            left: `${p.stock} units left`,
+            // p.images might be a string or an array of strings; ensure we pass a single string to img.src
+            image: Array.isArray(p.images)
+              ? p.images[0] ||
+                "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=150&q=80"
+              : p.images ||
+                "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=150&q=80",
+          }))
+      : fallbackStockWarnings;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch select-none">
@@ -47,20 +66,20 @@ export const SellerRevenueStock: React.FC = () => {
           <div className="flex bg-[#faf8ff] rounded-full p-1 border border-[#dfbec4]/20">
             <button
               onClick={() => setTab("week")}
-              className={`px-4 py-1.5 rounded-full font-bold text-[10px] transition-all cursor-pointer ${
+              className={`px-4 py-1.5 rounded-full font-bold text-[10px] transition-all cursor-pointer border-none ${
                 tab === "week"
                   ? "bg-[#ffd9df] text-[#b31f56]"
-                  : "text-[#584045]/60"
+                  : "text-[#584045]/60 bg-none"
               }`}
             >
               Week
             </button>
             <button
               onClick={() => setTab("month")}
-              className={`px-4 py-1.5 rounded-full font-bold text-[10px] transition-all cursor-pointer ${
+              className={`px-4 py-1.5 rounded-full font-bold text-[10px] transition-all cursor-pointer border-none ${
                 tab === "month"
                   ? "bg-[#ffd9df] text-[#b31f56]"
-                  : "text-[#584045]/60"
+                  : "text-[#584045]/60 bg-none"
               }`}
             >
               Month
@@ -70,116 +89,46 @@ export const SellerRevenueStock: React.FC = () => {
 
         {/* Vertical histograms list */}
         <div className="h-60 flex items-end justify-between gap-4 pt-6 px-2 relative border-b border-[#dfbec4]/20 pb-1">
-          {/* Monday */}
-          <div className="flex-grow flex flex-col items-center group relative h-full justify-end">
-            <div className="absolute -top-7 bg-[#131b2e] text-white px-2 py-0.5 rounded text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              $420
-            </div>
+          {[
+            { day: "Mon", val: "$420", h: "40%" },
+            { day: "Tue", val: "$680", h: "65%" },
+            { day: "Wed", val: "$590", h: "55%" },
+            { day: "Thu", val: "$1,100", h: "90%", peak: true },
+            { day: "Fri", val: "$480", h: "45%" },
+            { day: "Sat", val: "$820", h: "75%" },
+            { day: "Sun", val: "$950", h: "85%" },
+          ].map((bar, idx) => (
             <div
-              className="w-full bg-[#ffd9df] hover:bg-[#ff5c8d]/30 transition-all rounded-t-xl"
-              style={{ height: "40%" }}
-            />
-            <span className="text-[10px] font-bold text-[#584045]/60 mt-3.5">
-              Mon
-            </span>
-          </div>
-
-          {/* Tuesday */}
-          <div className="flex-grow flex flex-col items-center group relative h-full justify-end">
-            <div className="absolute -top-7 bg-[#131b2e] text-white px-2 py-0.5 rounded text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              $680
+              key={idx}
+              className="flex-grow flex flex-col items-center group relative h-full justify-end"
+            >
+              <div className="absolute -top-7 bg-[#131b2e] text-white px-2 py-0.5 rounded text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                {bar.val}
+              </div>
+              <div
+                className={`w-full transition-all rounded-t-xl ${bar.peak ? "bg-[#ff5c8d]" : "bg-[#ffd9df] hover:bg-[#ff5c8d]/30"}`}
+                style={{ height: bar.h }}
+              />
+              <span
+                className={`text-[10px] mt-3.5 ${bar.peak ? "font-extrabold text-[#b31f56]" : "font-bold text-[#584045]/60"}`}
+              >
+                {bar.day}
+              </span>
             </div>
-            <div
-              className="w-full bg-[#ffd9df] hover:bg-[#ff5c8d]/30 transition-all rounded-t-xl"
-              style={{ height: "65%" }}
-            />
-            <span className="text-[10px] font-bold text-[#584045]/60 mt-3.5">
-              Tue
-            </span>
-          </div>
-
-          {/* Wednesday */}
-          <div className="flex-grow flex flex-col items-center group relative h-full justify-end">
-            <div className="absolute -top-7 bg-[#131b2e] text-white px-2 py-0.5 rounded text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              $590
-            </div>
-            <div
-              className="w-full bg-[#ffd9df] hover:bg-[#ff5c8d]/30 transition-all rounded-t-xl"
-              style={{ height: "55%" }}
-            />
-            <span className="text-[10px] font-bold text-[#584045]/60 mt-3.5">
-              Wed
-            </span>
-          </div>
-
-          {/* Thursday (Peak) */}
-          <div className="flex-grow flex flex-col items-center group relative h-full justify-end">
-            <div className="absolute -top-7 bg-[#131b2e] text-white px-2 py-0.5 rounded text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              $1,100
-            </div>
-            <div
-              className="w-full bg-[#ff5c8d] rounded-t-xl"
-              style={{ height: "90%" }}
-            />
-            <span className="text-[10px] font-extrabold text-[#b31f56] mt-3.5">
-              Thu
-            </span>
-          </div>
-
-          {/* Friday */}
-          <div className="flex-grow flex flex-col items-center group relative h-full justify-end">
-            <div className="absolute -top-7 bg-[#131b2e] text-white px-2 py-0.5 rounded text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              $480
-            </div>
-            <div
-              className="w-full bg-[#ffd9df] hover:bg-[#ff5c8d]/30 transition-all rounded-t-xl"
-              style={{ height: "45%" }}
-            />
-            <span className="text-[10px] font-bold text-[#584045]/60 mt-3.5">
-              Fri
-            </span>
-          </div>
-
-          {/* Saturday */}
-          <div className="flex-grow flex flex-col items-center group relative h-full justify-end">
-            <div className="absolute -top-7 bg-[#131b2e] text-white px-2 py-0.5 rounded text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              $820
-            </div>
-            <div
-              className="w-full bg-[#ffd9df] hover:bg-[#ff5c8d]/30 transition-all rounded-t-xl"
-              style={{ height: "75%" }}
-            />
-            <span className="text-[10px] font-bold text-[#584045]/60 mt-3.5">
-              Sat
-            </span>
-          </div>
-
-          {/* Sunday */}
-          <div className="flex-grow flex flex-col items-center group relative h-full justify-end">
-            <div className="absolute -top-7 bg-[#131b2e] text-white px-2 py-0.5 rounded text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              $950
-            </div>
-            <div
-              className="w-full bg-[#ffd9df] hover:bg-[#ff5c8d]/30 transition-all rounded-t-xl"
-              style={{ height: "85%" }}
-            />
-            <span className="text-[10px] font-bold text-[#584045]/60 mt-3.5">
-              Sun
-            </span>
-          </div>
+          ))}
         </div>
       </div>
 
       {/* Right stock alerts checklist panel */}
       <div className="bg-white p-6 rounded-3xl border border-[#dfbec4]/30 shadow-sm flex flex-col justify-between">
         <h3 className="font-display text-sm font-extrabold text-[#131b2e] mb-6">
-          Low Stock Alerts
+          Low Stock Alerts ({lowStockItems.length})
         </h3>
 
         <div className="space-y-4">
-          {stockWarnings.map((item, idx) => (
+          {lowStockItems.slice(0, 3).map((item) => (
             <div
-              key={idx}
+              key={item.id}
               className="flex items-center gap-3 p-2 hover:bg-[#faf8ff] rounded-2xl transition-all border border-[#dfbec4]/10"
             >
               <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-[#dfbec4]/20">
@@ -197,14 +146,21 @@ export const SellerRevenueStock: React.FC = () => {
                   {item.left}
                 </p>
               </div>
-              <button className="w-7 h-7 rounded-full bg-[#f2f3ff] hover:bg-[#b31f56] hover:text-white text-[#b31f56] flex items-center justify-center transition-all cursor-pointer">
+              <button
+                onClick={() => item.id && navigate(`/products/edit/${item.id}`)}
+                className="w-7 h-7 rounded-full bg-[#f2f3ff] hover:bg-[#b31f56] hover:text-white text-[#b31f56] flex items-center justify-center transition-all cursor-pointer border-none"
+                title="Restock Product"
+              >
                 <MdAdd className="w-4.5 h-4.5" />
               </button>
             </div>
           ))}
         </div>
 
-        <button className="mt-6 w-full py-2.5 border-2 border-[#dfbec4] hover:bg-[#faf8ff] text-[#584045] font-bold rounded-2xl transition-colors text-xs cursor-pointer">
+        <button
+          onClick={() => navigate("/inventory")}
+          className="mt-6 w-full py-2.5 border-2 border-[#dfbec4] hover:bg-[#faf8ff] text-[#584045] font-bold rounded-2xl transition-colors text-xs cursor-pointer border-none"
+        >
           View All Inventory
         </button>
       </div>

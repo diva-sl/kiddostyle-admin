@@ -1,6 +1,32 @@
 import React from "react";
+import { useOrders } from "../hooks/useOrders";
 
-export const SellerPaymentsHeader: React.FC = () => {
+interface SellerPaymentsHeaderProps {
+  sellerId?: string;
+}
+
+export const SellerPaymentsHeader: React.FC<SellerPaymentsHeaderProps> = ({
+  sellerId,
+}) => {
+  const { data: dbOrders = [] } = useOrders(
+    sellerId ? { sellerId } : undefined,
+  );
+
+  const grossSales =
+    dbOrders.length > 0
+      ? dbOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0)
+      : 15200;
+
+  const marketplaceFees = grossSales * 0.12; // 12% fee
+  const shippingCosts = grossSales * 0.04; // 4% shipping
+  const availableBalance = grossSales - marketplaceFees - shippingCosts;
+
+  const handleWithdraw = () => {
+    alert(
+      `Withdrawal request of $${availableBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} initiated to your default payout account!`,
+    );
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch select-none">
       {/* Available Balance Card (col-span-7) */}
@@ -9,18 +35,29 @@ export const SellerPaymentsHeader: React.FC = () => {
           <p className="text-[10px] font-extrabold opacity-80 uppercase tracking-widest mb-1">
             Available Balance
           </p>
-          <h3 className="text-4xl font-extrabold">$12,840.50</h3>
+          <h3 className="text-4xl font-extrabold">
+            $
+            {availableBalance.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </h3>
         </div>
 
         <div className="relative z-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mt-6">
           <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 flex-1">
             <p className="text-[9px] font-bold opacity-90 uppercase tracking-wider">
-              Next Payout
+              Next Scheduled Payout
             </p>
-            <p className="text-base font-extrabold mt-0.5">Oct 24, 2023</p>
+            <p className="text-base font-extrabold mt-0.5">
+              Every Monday (Auto)
+            </p>
           </div>
 
-          <button className="bg-[#ffd167] text-[#765900] px-6 py-3 rounded-full font-bold text-xs hover:bg-[#ffdf9b] transition-all active:scale-[0.98] cursor-pointer shadow-md self-center">
+          <button
+            onClick={handleWithdraw}
+            className="bg-[#ffd167] text-[#765900] px-6 py-3 rounded-full font-bold text-xs hover:bg-[#ffdf9b] transition-all active:scale-[0.98] cursor-pointer shadow-md self-center border-none"
+          >
             Withdraw Now
           </button>
         </div>
@@ -40,20 +77,32 @@ export const SellerPaymentsHeader: React.FC = () => {
           <div>
             <div className="flex justify-between mb-1.5">
               <span>Gross Sales</span>
-              <span className="font-bold">$15,200</span>
+              <span className="font-bold">
+                $
+                {grossSales.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
             </div>
             <div className="w-full bg-[#f2f3ff] rounded-full h-2.5 overflow-hidden">
               <div
                 className="bg-[#b31f56] h-full rounded-full"
-                style={{ width: "82%" }}
+                style={{ width: "84%" }}
               />
             </div>
           </div>
 
           <div>
             <div className="flex justify-between mb-1.5">
-              <span>Marketplace Fees</span>
-              <span className="text-[#584045]/60 font-bold">-$1,840</span>
+              <span>Marketplace Fees (12%)</span>
+              <span className="text-[#584045]/60 font-bold">
+                -$
+                {marketplaceFees.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
             </div>
             <div className="w-full bg-[#f2f3ff] rounded-full h-2.5 overflow-hidden">
               <div
@@ -65,20 +114,26 @@ export const SellerPaymentsHeader: React.FC = () => {
 
           <div>
             <div className="flex justify-between mb-1.5">
-              <span>Shipping Costs</span>
-              <span className="text-[#584045]/60 font-bold">-$519</span>
+              <span>Shipping Costs (4%)</span>
+              <span className="text-[#584045]/60 font-bold">
+                -$
+                {shippingCosts.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
             </div>
             <div className="w-full bg-[#f2f3ff] rounded-full h-2.5 overflow-hidden">
               <div
                 className="bg-[#00a4ca] h-full rounded-full"
-                style={{ width: "6%" }}
+                style={{ width: "4%" }}
               />
             </div>
           </div>
         </div>
 
         <p className="text-[9px] text-[#584045]/50 font-bold mt-4 text-center italic">
-          Calculated based on the last 30 days of activity.
+          Calculated based on your active seller order activity.
         </p>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { apiClient } from "./apiClient";
 
 export interface OrderItem {
   productId: string;
+  sellerId?: string; // Vendor associated with this item
   name: string;
   price: number;
   quantity: number;
@@ -22,14 +23,15 @@ export interface Order {
   totalAmount: number;
   status: string; // "pending", "processing", "shipped", "delivered", "cancelled"
   paymentMethod: string;
-  paymentStatus: string; // "pending", "paid", "failed", "refunded"
+  paymentStatus: string;
   createdAt?: string;
   updatedAt?: string;
 }
 
 export const orderService = {
-  getOrders: async (): Promise<Order[]> => {
-    const { data } = await apiClient.get<Order[]>("/orders");
+  // Filter seller transactions by passing sellerId
+  getOrders: async (params?: { sellerId?: string }): Promise<Order[]> => {
+    const { data } = await apiClient.get<Order[]>("/orders", { params });
     return data;
   },
   createOrder: async (data: Order): Promise<Order> => {
