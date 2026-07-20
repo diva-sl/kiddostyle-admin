@@ -3,18 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { MdEdit, MdDelete } from "react-icons/md";
 import { useArticles, useDeleteArticle } from "../hooks/useBlog";
 
-interface ChartBar {
-  title: string;
-  meta: string;
-  author: string;
-  category: string;
-  categoryColor: string;
-  status: "published" | "scheduled" | "draft";
-  statusText: string;
-  statusColor: string;
-  image: string;
-}
-
 const fallbackPosts = [
   {
     id: "1",
