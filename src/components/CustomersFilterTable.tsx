@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  MdArrowDropDown,
   MdEdit,
   MdDelete,
   MdVisibility,
@@ -9,7 +8,6 @@ import {
   MdChevronRight,
 } from "react-icons/md";
 import { useCustomers, useDeleteCustomer } from "../hooks/useCustomers";
-import type { Customer } from "../services/customerService";
 
 const sampleFallbackCustomers = [
   {

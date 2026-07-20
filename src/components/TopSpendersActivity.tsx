@@ -2,7 +2,6 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { MdShoppingBag, MdPersonAdd, MdStar, MdLoyalty } from "react-icons/md";
 import { useCustomers } from "../hooks/useCustomers";
-import type { Customer } from "../services/customerService";
 
 interface SpenderItem {
   id: string;

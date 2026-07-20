@@ -106,13 +106,14 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
           const stockType = p.stock > 10 ? "in" : p.stock > 0 ? "low" : "out";
           const stockText =
             p.stock > 0 ? `In Stock (${p.stock})` : "Out of Stock";
+          const idStr = p.id || "";
           return {
-            id: p.id,
+            id: idStr,
             name: p.name,
             subtitle: p.description
               ? p.description.substring(0, 45) + "..."
               : "No description",
-            sku: p.id.substring(0, 8).toUpperCase(),
+            sku: (idStr || "KD000000").substring(0, 8).toUpperCase(),
             category: p.category,
             categoryColor: p.category.toLowerCase().includes("girl")
               ? "bg-[#00a4ca]/10 text-[#006780]"

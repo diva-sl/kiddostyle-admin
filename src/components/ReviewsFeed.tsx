@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { MdStar, MdFlag } from "react-icons/md";
+import { MdStar } from "react-icons/md";
 import {
   useReviews,
   useUpdateReviewStatus,
   useDeleteReview,
 } from "../hooks/useReviews";
-import type { Review } from "../services/reviewService";
 
 interface ReviewsFeedProps {
   ratingFilter: string;

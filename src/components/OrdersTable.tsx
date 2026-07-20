@@ -7,7 +7,6 @@ import {
   MdChevronRight,
 } from "react-icons/md";
 import { useOrders, useDeleteOrder } from "../hooks/useOrders";
-import type { Order } from "../services/orderService";
 
 interface OrdersTableProps {
   activeTab: string;

@@ -45,9 +45,7 @@ const historyList: OrderRow[] = [
   },
 ];
 
-export const CustomerOrderHistory: React.FC<CustomerOrderHistoryProps> = ({
-  customer,
-}) => {
+export const CustomerOrderHistory: React.FC<CustomerOrderHistoryProps> = () => {
   return (
     <div className="bg-white rounded-3xl border border-[#dfbec4]/30 shadow-sm overflow-hidden select-none">
       {/* Title */}

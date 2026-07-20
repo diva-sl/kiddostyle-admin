@@ -137,7 +137,7 @@ export const ProductFormProvider: React.FC<{ children: React.ReactNode }> = ({
         .then((data) => {
           setFormState({
             name: data.name,
-            description: data.description,
+            description: data.description || "",
             category: data.category,
             sku: id.substring(0, 8).toUpperCase(),
             price: data.price,

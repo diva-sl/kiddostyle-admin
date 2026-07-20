@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MdFilterList, MdDownload, MdEdit, MdDelete } from "react-icons/md";
+import { MdEdit, MdDelete } from "react-icons/md";
 import { useArticles, useDeleteArticle } from "../hooks/useBlog";
 
 interface ChartBar {

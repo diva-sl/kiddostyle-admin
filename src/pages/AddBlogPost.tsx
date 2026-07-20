@@ -3,10 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   MdChevronRight,
   MdArrowBack,
-  MdCheckCircle,
-  MdCloudUpload,
-} from "react-icons/md";
-import {
   MdCheckCircle as CheckIcon,
   MdCloudUpload as UploadIcon,
 } from "react-icons/md";

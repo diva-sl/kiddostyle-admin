@@ -114,7 +114,7 @@ export const AddOrderPage: React.FC = () => {
       setItems([
         ...items,
         {
-          productId: prod.id,
+          productId: prod.id || "",
           name: prod.name,
           price: prod.price,
           quantity: selectedQty,

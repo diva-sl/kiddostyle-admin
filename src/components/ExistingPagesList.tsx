@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  MdFilterList,
   MdVisibility,
   MdEdit,
   MdDelete,
-  MdBarChart,
   MdChevronLeft,
   MdChevronRight,
 } from "react-icons/md";

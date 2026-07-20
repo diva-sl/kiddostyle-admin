@@ -125,11 +125,12 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
                 ? "Low Stock"
                 : "Out of Stock";
 
+          const idStr = p.id || "";
           return {
-            id: p.id,
+            id: idStr,
             name: p.name,
             category: p.category,
-            sku: p.id.substring(0, 8).toUpperCase(),
+            sku: (idStr || "KD000000").substring(0, 8).toUpperCase(),
             warehouse,
             totalStock: p.stock,
             committed,

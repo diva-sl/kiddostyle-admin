@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { MdPerson, MdCloudUpload, MdCheckCircle, MdLock } from "react-icons/md";
+import { MdCloudUpload, MdCheckCircle, MdLock } from "react-icons/md";
 import { apiClient } from "../services/apiClient";
 
 export const ProfilePage: React.FC = () => {
