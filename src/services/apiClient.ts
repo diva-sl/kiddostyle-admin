@@ -1,7 +1,14 @@
 import axios from "axios";
 
+// Environment-aware API URL detection for local and production logins
+const defaultApiUrl =
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+    ? "http://localhost:5000/api"
+    : "https://api.kiddostyle.gcvdanta.com/api";
+
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://api.kiddostyle.gcvdanta.com/api",
+  baseURL: import.meta.env.VITE_API_URL || defaultApiUrl,
   headers: {
     "Content-Type": "application/json",
   },
