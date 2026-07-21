@@ -87,17 +87,18 @@ export const CatalogStructureTable: React.FC<CatalogStructureTableProps> = ({
   };
 
   // Map categories and compute product counts dynamically
+  const safeProducts = Array.isArray(products) ? products : [];
   const displayList: Category[] =
     dbCategories && dbCategories.length > 0
       ? dbCategories.map((c) => {
-          const total = products.filter(
-            (p) => p.category.toLowerCase() === c.name.toLowerCase(),
+          const total = safeProducts.filter(
+            (p) => (p?.category || "").toLowerCase() === (c?.name || "").toLowerCase(),
           ).length;
           return { ...c, totalProducts: total };
         })
       : sampleFallbackCategories.map((c) => {
-          const total = products.filter(
-            (p) => p.category.toLowerCase() === c.name.toLowerCase(),
+          const total = safeProducts.filter(
+            (p) => (p?.category || "").toLowerCase() === (c?.name || "").toLowerCase(),
           ).length;
           return {
             id: c.id,

@@ -4,25 +4,28 @@ import { useOrders } from "../hooks/useOrders";
 import { useProducts } from "../hooks/useProducts";
 
 export const SellerStatsGrid: React.FC = () => {
-  const { data: orders = [] } = useOrders();
-  const { data: products = [] } = useProducts();
+  const { data: rawOrders } = useOrders();
+  const { data: rawProducts } = useProducts();
+
+  const orders = Array.isArray(rawOrders) ? rawOrders : [];
+  const products = Array.isArray(rawProducts) ? rawProducts : [];
 
   // Calculate Today's Sales
   const totalSales =
     orders.length > 0
-      ? orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0)
+      ? orders.reduce((sum, o) => sum + (o?.totalAmount || 0), 0)
       : 1420.5;
 
   // Calculate Pending Orders
   const pendingOrdersCount =
     orders.length > 0
-      ? orders.filter((o) => o.status === "pending").length
+      ? orders.filter((o) => o?.status === "pending").length
       : 24;
 
   // Calculate Low Stock Count (stock <= 5)
   const lowStockCount =
     products.length > 0
-      ? products.filter((p) => (p.stock || 0) <= 5).length
+      ? products.filter((p) => (p?.stock || 0) <= 5).length
       : 8;
 
   return (

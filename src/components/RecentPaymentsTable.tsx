@@ -60,9 +60,10 @@ export const RecentPaymentsTable: React.FC<RecentPaymentsTableProps> = ({
   sellerId,
 }) => {
   const navigate = useNavigate();
-  const { data: dbOrders = [], isLoading } = useOrders(
+  const { data: rawOrders, isLoading } = useOrders(
     sellerId ? { sellerId } : undefined,
   );
+  const dbOrders = Array.isArray(rawOrders) ? rawOrders : [];
   const [filter, setFilter] = useState<"all" | "sales" | "refunds">("all");
 
   const displayList: TxnDisplayItem[] =

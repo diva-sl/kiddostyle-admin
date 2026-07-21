@@ -70,9 +70,10 @@ export const OrderDirectoryTable: React.FC<OrderDirectoryTableProps> = ({
   sellerId,
 }) => {
   const navigate = useNavigate();
-  const { data: dbOrders = [], isLoading } = useOrders(
+  const { data: rawOrders, isLoading } = useOrders(
     sellerId ? { sellerId } : undefined,
   );
+  const dbOrders = Array.isArray(rawOrders) ? rawOrders : [];
 
   const [filter, setFilter] = useState<
     "all" | "pending" | "shipped" | "delivered" | "cancelled"

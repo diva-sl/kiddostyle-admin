@@ -44,9 +44,18 @@ const fallbackCatalog = [
   },
 ];
 
-export const ProductCatalogTable: React.FC = () => {
+interface ProductCatalogTableProps {
+  sellerId?: string;
+}
+
+export const ProductCatalogTable: React.FC<ProductCatalogTableProps> = ({
+  sellerId,
+}) => {
   const navigate = useNavigate();
-  const { data: dbProducts = [], isLoading } = useProducts();
+  const { data: rawProducts, isLoading } = useProducts(
+    sellerId ? { sellerId } : undefined,
+  );
+  const dbProducts = Array.isArray(rawProducts) ? rawProducts : [];
 
   // Filter & Search states
   const [showFilterTray, setShowFilterTray] = useState(false);

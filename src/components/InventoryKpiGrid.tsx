@@ -8,21 +8,22 @@ import {
 import { useProducts } from "../hooks/useProducts";
 
 export const InventoryKpiGrid: React.FC = () => {
-  const { data: products = [] } = useProducts();
+  const { data: rawProducts } = useProducts();
+  const products = Array.isArray(rawProducts) ? rawProducts : [];
 
   // 1. Calculate live total inventory value: sum of (price * stock)
-  const totalVal = products.reduce((sum, p) => sum + p.price * p.stock, 0);
+  const totalVal = products.reduce((sum, p) => sum + (p?.price || 0) * (p?.stock || 0), 0);
   const formattedVal =
     totalVal > 1000 ? `$${(totalVal / 1000).toFixed(1)}k` : `$${totalVal}`;
 
   // 2. Count Out of Stock items (stock == 0)
   const outOfStockCount =
-    products.length > 0 ? products.filter((p) => p.stock === 0).length : 24;
+    products.length > 0 ? products.filter((p) => p?.stock === 0).length : 24;
 
   // 3. Count Low Stock items (0 < stock <= 10)
   const lowStockCount =
     products.length > 0
-      ? products.filter((p) => p.stock > 0 && p.stock <= 10).length
+      ? products.filter((p) => (p?.stock || 0) > 0 && (p?.stock || 0) <= 10).length
       : 156;
 
   // 4. Incoming Shipments (Simulated/Fallback)

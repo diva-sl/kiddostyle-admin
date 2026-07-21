@@ -78,7 +78,7 @@ export const ReviewsFeed: React.FC<ReviewsFeedProps> = ({
 
   // Cast displayList to any[] to bypass strict structural checks for fallback rows
   const displayList: any[] =
-    dbReviews && dbReviews.length > 0 ? dbReviews : fallbackReviewsList;
+    Array.isArray(dbReviews) && dbReviews.length > 0 ? dbReviews : fallbackReviewsList;
 
   // Filter feed items
   const filteredList = displayList.filter((r) => {

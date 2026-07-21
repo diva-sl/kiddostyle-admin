@@ -29,7 +29,8 @@ const fallbackStockWarnings = [
 
 export const SellerRevenueStock: React.FC = () => {
   const navigate = useNavigate();
-  const { data: products = [] } = useProducts();
+  const { data: rawProducts } = useProducts();
+  const products = Array.isArray(rawProducts) ? rawProducts : [];
   const [tab, setTab] = useState<"week" | "month">("week");
 
   // Filter low stock items from live products collection

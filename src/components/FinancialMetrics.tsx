@@ -15,9 +15,10 @@ export const FinancialMetrics: React.FC<FinancialMetricsProps> = ({
   orders,
 }) => {
   // 1. Calculate Gross Revenue dynamically
+  const safeOrders = Array.isArray(orders) ? orders : [];
   const grossRevenue =
-    orders.length > 0
-      ? orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0)
+    safeOrders.length > 0
+      ? safeOrders.reduce((sum, o) => sum + (o?.totalAmount || 0), 0)
       : 113842.0;
 
   // 2. Shipping calculations (approx 7.2% of gross)

@@ -72,7 +72,7 @@ export const CustomersFilterTable: React.FC = () => {
 
   // Map to unified customer representation
   const displayList =
-    dbCustomers && dbCustomers.length > 0
+    Array.isArray(dbCustomers) && dbCustomers.length > 0
       ? dbCustomers.map((c) => {
           const initials = c.name
             .split(" ")

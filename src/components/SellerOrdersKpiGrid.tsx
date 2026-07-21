@@ -14,26 +14,27 @@ interface SellerOrdersKpiGridProps {
 export const SellerOrdersKpiGrid: React.FC<SellerOrdersKpiGridProps> = ({
   sellerId,
 }) => {
-  const { data: dbOrders = [] } = useOrders(
+  const { data: rawOrders } = useOrders(
     sellerId ? { sellerId } : undefined,
   );
+  const dbOrders = Array.isArray(rawOrders) ? rawOrders : [];
 
   const pendingCount =
     dbOrders.length > 0
-      ? dbOrders.filter((o) => o.status === "pending").length
+      ? dbOrders.filter((o) => o?.status === "pending").length
       : 24;
   const shippedCount =
     dbOrders.length > 0
-      ? dbOrders.filter((o) => o.status === "shipped").length
+      ? dbOrders.filter((o) => o?.status === "shipped").length
       : 18;
   const deliveredCount =
     dbOrders.length > 0
-      ? dbOrders.filter((o) => o.status === "delivered").length
+      ? dbOrders.filter((o) => o?.status === "delivered").length
       : 42;
 
   const dailyRevenue =
     dbOrders.length > 0
-      ? dbOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0)
+      ? dbOrders.reduce((sum, o) => sum + (o?.totalAmount || 0), 0)
       : 2840;
 
   return (

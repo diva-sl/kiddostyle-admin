@@ -87,7 +87,8 @@ const activityList: ActivityItem[] = [
 
 export const TopSpendersActivity: React.FC = () => {
   const navigate = useNavigate();
-  const { data: customers = [] } = useCustomers();
+  const { data: rawCustomers } = useCustomers();
+  const customers = Array.isArray(rawCustomers) ? rawCustomers : [];
 
   // Sort by spent desc to display top spenders dynamically
   const displaySpenders: SpenderItem[] =

@@ -12,13 +12,14 @@ export const OrdersPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("All Orders");
   const [searchQuery, setSearchQuery] = useState("");
 
+  const safeOrders = Array.isArray(dbOrders) ? dbOrders : [];
   const activeShipmentsCount =
-    dbOrders.length > 0
-      ? dbOrders.filter(
+    safeOrders.length > 0
+      ? safeOrders.filter(
           (o) =>
-            o.status === "pending" ||
-            o.status === "processing" ||
-            o.status === "shipped",
+            o?.status === "pending" ||
+            o?.status === "processing" ||
+            o?.status === "shipped",
         ).length
       : 24;
 

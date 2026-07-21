@@ -47,7 +47,8 @@ const sampleFallbackBrands = [
 export const BrandsPortfolio: React.FC = () => {
   const navigate = useNavigate();
   const { data: dbBrands, isLoading } = useBrands();
-  const { data: products = [] } = useProducts();
+  const { data: rawProducts } = useProducts();
+  const products = Array.isArray(rawProducts) ? rawProducts : [];
   const deleteMutation = useDeleteBrand();
 
   const handleDelete = (id: string) => {
@@ -63,13 +64,13 @@ export const BrandsPortfolio: React.FC = () => {
     dbBrands && dbBrands.length > 0
       ? dbBrands.map((b) => {
           const total = products.filter(
-            (p) => p.brand?.toLowerCase() === b.name.toLowerCase(),
+            (p) => (p?.brand || "").toLowerCase() === (b?.name || "").toLowerCase(),
           ).length;
           return { ...b, products: total };
         })
       : sampleFallbackBrands.map((b) => {
           const total = products.filter(
-            (p) => p.brand?.toLowerCase() === b.name.toLowerCase(),
+            (p) => (p?.brand || "").toLowerCase() === (b?.name || "").toLowerCase(),
           ).length;
           return {
             id: b.id,

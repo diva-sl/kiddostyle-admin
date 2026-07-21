@@ -8,13 +8,14 @@ interface SellerPaymentsHeaderProps {
 export const SellerPaymentsHeader: React.FC<SellerPaymentsHeaderProps> = ({
   sellerId,
 }) => {
-  const { data: dbOrders = [] } = useOrders(
+  const { data: rawOrders } = useOrders(
     sellerId ? { sellerId } : undefined,
   );
+  const dbOrders = Array.isArray(rawOrders) ? rawOrders : [];
 
   const grossSales =
     dbOrders.length > 0
-      ? dbOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0)
+      ? dbOrders.reduce((sum, o) => sum + (o?.totalAmount || 0), 0)
       : 15200;
 
   const marketplaceFees = grossSales * 0.12; // 12% fee

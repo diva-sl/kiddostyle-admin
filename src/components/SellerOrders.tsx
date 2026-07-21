@@ -35,7 +35,8 @@ const fallbackOrders = [
 
 export const SellerOrders: React.FC = () => {
   const navigate = useNavigate();
-  const { data: dbOrders = [], isLoading } = useOrders();
+  const { data: rawOrders, isLoading } = useOrders();
+  const dbOrders = Array.isArray(rawOrders) ? rawOrders : [];
 
   const displayList =
     dbOrders.length > 0
