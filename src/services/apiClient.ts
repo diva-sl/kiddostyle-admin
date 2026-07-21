@@ -4,7 +4,7 @@ import axios from "axios";
 const defaultApiUrl =
   typeof window !== "undefined" &&
   (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-    ? "http://localhost:5000/api"
+    ? "http://localhost:8081/api"
     : "https://api.kiddostyle.gcvdanta.com/api";
 
 export const apiClient = axios.create({
