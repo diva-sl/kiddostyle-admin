@@ -24,9 +24,10 @@ const fallbackWeeklyData: ChartBarRow[] = [
 
 export const DailySalesMix: React.FC<DailySalesMixProps> = ({ orders }) => {
   // Aggregate sales mix if orders are in live DB
+  const safeOrders = Array.isArray(orders) ? orders : [];
   const totalGross =
-    orders.length > 0
-      ? orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0)
+    safeOrders.length > 0
+      ? safeOrders.reduce((sum, o) => sum + (o?.totalAmount || 0), 0)
       : 113842.0;
 
   const girlsRevenue = totalGross * 0.48;

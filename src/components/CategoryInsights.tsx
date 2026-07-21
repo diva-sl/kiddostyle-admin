@@ -11,8 +11,11 @@ interface PerformanceItem {
 }
 
 export const CategoryInsights: React.FC = () => {
-  const { data: categories = [] } = useCategories();
-  const { data: products = [] } = useProducts();
+  const { data: rawCategories } = useCategories();
+  const { data: rawProducts } = useProducts();
+
+  const categories = Array.isArray(rawCategories) ? rawCategories : [];
+  const products = Array.isArray(rawProducts) ? rawProducts : [];
 
   const totalProducts = products.length || 1;
 
@@ -22,7 +25,7 @@ export const CategoryInsights: React.FC = () => {
   if (categories.length > 0) {
     const list = categories.map((cat) => {
       const count = products.filter(
-        (p) => p.category.toLowerCase() === cat.name.toLowerCase(),
+        (p) => (p?.category || "").toLowerCase() === (cat?.name || "").toLowerCase(),
       ).length;
       const percentage = Math.round((count / totalProducts) * 100);
       return {

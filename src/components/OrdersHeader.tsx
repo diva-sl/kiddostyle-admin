@@ -16,9 +16,10 @@ export const OrdersHeader: React.FC<OrdersHeaderProps> = ({
 
   // Fallback layout helper if database list is empty
   const getExportData = () => {
+    const safeOrders = Array.isArray(dbOrders) ? dbOrders : [];
     const list =
-      dbOrders.length > 0
-        ? dbOrders
+      safeOrders.length > 0
+        ? safeOrders
         : [
             {
               orderNumber: "KS-8892",

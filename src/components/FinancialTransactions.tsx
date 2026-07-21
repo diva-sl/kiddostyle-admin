@@ -48,9 +48,10 @@ export const FinancialTransactions: React.FC<FinancialTransactionsProps> = ({
   const [filter, setFilter] = useState<"all" | "paid" | "refunded">("all");
 
   // Map orders list to transactional structure or fall back
+  const safeOrders = Array.isArray(orders) ? orders : [];
   const displayList =
-    orders.length > 0
-      ? orders.map((o) => {
+    safeOrders.length > 0
+      ? safeOrders.map((o) => {
           const initials = (o.customer?.name || "G")
             .split(" ")
             .map((w: string) => w[0])
